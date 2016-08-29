@@ -171,7 +171,7 @@ public class ActivityDetail extends ActivityBase implements
                 .show();
     }
 
-    // Method to open Google Maps app
+    // Method to open Google Maps
     public void openGoogleMaps(){
         // Check whether Google App is installed in user device
         if(isGoogleMapsInstalled())
