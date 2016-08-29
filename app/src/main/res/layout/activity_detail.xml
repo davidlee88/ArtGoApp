@@ -1,0 +1,281 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/window_background_color">
+
+    <com.github.ksoichiro.android.observablescrollview.ObservableScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Location image -->
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/parallax_image_plus_toolbar_height"
+                android:scaleType="centerCrop" />
+
+            <View
+                android:id="@+id/anchor"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/parallax_image_height"
+                android:minHeight="@dimen/parallax_image_height" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/parallax_image_height"
+                android:background="@android:color/transparent">
+
+                <FrameLayout
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent">
+
+                    <!-- Admob banner -->
+                    <com.google.android.gms.ads.AdView
+                        android:id="@+id/adView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ads:adSize="BANNER"
+                        ads:adUnitId="@string/banner_ad_unit_id"
+                        android:layout_gravity="top|center">
+                    </com.google.android.gms.ads.AdView>
+
+                    <!-- Location title and action buttons card -->
+                    <android.support.v7.widget.CardView
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/card_view"
+                        android:layout_gravity="bottom|left"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        card_view:cardCornerRadius="@dimen/card_radius"
+                        card_view:cardElevation="@dimen/card_elevation"
+                        card_view:cardUseCompatPadding="true"
+                        android:layout_marginTop="@dimen/title_margin_top"
+                        android:paddingTop="@dimen/standard_margin"
+                        android:paddingBottom="@dimen/standard_margin"
+                        android:layout_marginLeft="@dimen/card_margin"
+                        android:layout_marginRight="@dimen/card_margin"
+                        android:layout_marginBottom="@dimen/card_margin"
+                        android:background="@color/material_background_color">
+                        <LinearLayout
+                            android:id="@+id/lytTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- Location name, category, and distance -->
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/standard_margin"
+                                android:paddingBottom="@dimen/standard_margin"
+                                android:background="@color/material_background_color">
+
+                                <TextView
+                                    android:id="@+id/txtLocationName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingLeft="@dimen/standard_margin"
+                                    android:paddingRight="@dimen/item_padding_right_with_fab"
+                                    android:layout_alignParentLeft="true"
+                                    android:textSize="@dimen/headline"
+                                    android:textColor="@color/primary_text"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/txtLocationCategory"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingLeft="@dimen/standard_margin"
+                                    android:paddingRight="@dimen/item_padding_right_with_fab"
+                                    android:layout_alignParentLeft="true"
+                                    android:layout_below="@+id/txtLocationName"
+                                    android:textSize="@dimen/body_1"
+                                    android:textColor="@color/secondary_text"/>
+
+                                <TextView
+                                    android:id="@+id/txtLocationDistance"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingRight="@dimen/standard_margin"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_below="@+id/txtLocationName"
+                                    android:textStyle="bold"
+                                    android:textSize="@dimen/body_1"
+                                    android:textColor="@color/secondary_text"/>
+
+                            </RelativeLayout>
+                            <View
+                                android:id="@+id/divider"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/divider_height"
+                                android:background="@color/divider_color"
+                                android:layout_below="@+id/txtLocationCategory"/>
+
+                            <!-- Action buttons to call, website, and share -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="@dimen/standard_margin"
+                                android:paddingBottom="@dimen/standard_margin"
+                                android:paddingLeft="@dimen/standard_margin"
+                                android:paddingRight="@dimen/standard_margin"
+                                android:orientation="horizontal"
+                                android:background="@color/material_background_color"
+                                android:layout_below="@+id/divider">
+                                <!-- Call button -->
+
+                                    <LinearLayout
+                                        android:id="@+id/btnCall"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_weight="1">
+                                        <com.mikepenz.iconics.view.IconicsImageView
+                                            android:layout_width="@dimen/thumb_width_small"
+                                            android:layout_height="@dimen/thumb_height_small"
+                                            android:layout_gravity="center_horizontal"
+                                            app:iiv_icon="gmd-call"
+                                            app:iiv_color="@color/primary_color"/>
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="@dimen/standard_margin"
+                                            android:layout_gravity="center_horizontal"
+                                            android:textColor="@color/primary_color"
+                                            android:layout_centerVertical="true"
+                                            android:text="@string/call"/>
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:id="@+id/btnWebsite"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_weight="1">
+                                        <com.mikepenz.iconics.view.IconicsImageView
+                                            android:layout_width="@dimen/thumb_width_small"
+                                            android:layout_height="@dimen/thumb_height_small"
+                                            android:layout_gravity="center_horizontal"
+                                            android:layout_centerVertical="true"
+                                            app:iiv_icon="gmd_public"
+                                            app:iiv_color="@color/primary_color"/>
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="@dimen/standard_margin"
+                                            android:layout_gravity="center_horizontal"
+                                            android:textColor="@color/primary_color"
+                                            android:layout_centerVertical="true"
+                                            android:text="@string/website" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:id="@+id/btnShare"
+                                        android:layout_height="wrap_content"
+                                        android:layout_width="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_weight="1">
+                                        <com.mikepenz.iconics.view.IconicsImageView
+                                            android:layout_width="@dimen/thumb_width_small"
+                                            android:layout_height="@dimen/thumb_height_small"
+                                            android:layout_gravity="center_horizontal"
+                                            app:iiv_icon="gmd-share"
+                                            app:iiv_color="@color/primary_color"/>
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="@dimen/standard_margin"
+                                            android:layout_gravity="center_horizontal"
+                                            android:textColor="@color/primary_color"
+                                            android:layout_centerVertical="true"
+                                            android:text="@string/share" />
+                                    </LinearLayout>
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+                </FrameLayout>
+
+                <!-- Map card -->
+                <android.support.v7.widget.CardView
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="@dimen/card_radius"
+                    card_view:cardElevation="@dimen/card_elevation"
+                    card_view:cardUseCompatPadding="true"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:layout_marginBottom="@dimen/card_margin"
+                    android:background="@color/material_background_color">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:id="@+id/map"
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            android:name="com.google.android.gms.maps.SupportMapFragment"/>
+                            <!-- Direction button -->
+                            <com.gc.materialdesign.views.ButtonFlat
+                                android:id="@+id/flatDirection"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@color/accent_color"
+                                android:text="@string/get_direction"
+                                android:layout_margin="@dimen/standard_margin"/>
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <!-- Description card -->
+                <android.support.v7.widget.CardView
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="@dimen/card_radius"
+                    card_view:cardElevation="@dimen/card_elevation"
+                    card_view:cardUseCompatPadding="true"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:layout_marginBottom="@dimen/card_margin"
+                    android:background="@color/material_background_color">
+                    <org.sufficientlysecure.htmltextview.HtmlTextView
+                        android:id="@+id/txtDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/body_1"
+                        android:textColor="@color/primary_text"
+                        android:lineSpacingExtra="@dimen/line_spacing_body"
+                        android:paddingTop="@dimen/standard_margin"
+                        android:paddingBottom="@dimen/standard_margin"
+                        android:paddingLeft="@dimen/standard_margin"
+                        android:paddingRight="@dimen/standard_margin" />
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </com.github.ksoichiro.android.observablescrollview.ObservableScrollView>
+
+    <include layout="@layout/toolbar" />
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/prgLoading"
+        android:layout_width="@dimen/circleprogressbar_width"
+        android:layout_height="@dimen/circleprogressbar_height"
+        android:layout_gravity="center"
+        app:mlpb_enable_circle_background="true"/>
+</FrameLayout>

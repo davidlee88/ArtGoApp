@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.ArtGo.ArtGoApp.activities.ActivityHome">
+    <item android:id="@+id/menuAbout"
+        android:title="@string/action_about"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/menuView"
+        android:icon="@mipmap/ic_view_list_white_36dp"
+        android:title="@string/action_view"
+        app:showAsAction="always" />
+</menu>

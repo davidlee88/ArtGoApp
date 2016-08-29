@@ -1,0 +1,686 @@
+package com.ArtGo.ArtGoApp.activities;
+
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.toolbox.ImageLoader;
+import com.gc.materialdesign.views.ButtonFlat;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
+import com.github.mrengineer13.snackbar.SnackBar;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
+import com.nineoldandroids.view.ViewHelper;
+import com.ArtGo.ArtGoApp.R;
+import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
+import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
+import com.ArtGo.ArtGoApp.utils.MySingleton;
+import com.ArtGo.ArtGoApp.utils.Utils;
+
+import org.sufficientlysecure.htmltextview.HtmlTextView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static android.Manifest.permission.CALL_PHONE;
+
+/**
+ * Design and developed by pongodev.com
+ *
+ * ActivityDetail is created to display location detail.
+ * Created using ActivityBase.
+ */
+public class ActivityDetail extends ActivityBase implements
+        ObservableScrollViewCallbacks,
+        View.OnClickListener,
+        OnMapReadyCallback {
+
+    private static final String TAG = ActivityDetail.class.getSimpleName();
+
+    // Create view objects
+    private ImageView mImgLocationImage;
+    private Toolbar mToolbarView;
+    private ObservableScrollView mScrollView;
+    private int mParallaxImageHeight;
+    private HtmlTextView mTxtDescription;
+    private TextView mTxtLocationName, mTxtLocationCategory, mTxtLocationDistance;
+    private CircleProgressBar mPrgLoading;
+    private AdView mAdView;
+    private GoogleMap mMap;
+
+    // Create class objects and variables that required in this class
+    private ImageLoaderFromDrawable mImageLoaderFromDrawable;
+    private ImageLoader mImageLoader;
+    private DBHelperLocations mDBhelper;
+    private boolean mIsAdmobVisible;
+    private String mSelectedId;
+
+    private static final int REQUEST_CALL_PHONE = 0;
+
+    // Create variables to store location data
+    private String mLocationName, mLocationAddress, mLocationImage,
+            mLocationLongitude, mLocationLatitude, mLocationDescription, mLocationPhone,
+            mLocationWebsite, mLocationMarker, mLocationCategory;
+
+    // Create float array variable to store distance between location and user position
+    private float[] mDistance = new float[1];
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail);
+
+        // Get dimension value from dimens.xml
+        Resources mRes      = getResources();
+        int mImageWidth     = mRes.getDimensionPixelSize(R.dimen.flexible_space_image_height);
+        int mImageHeight    = mRes.getDimensionPixelSize(R.dimen.flexible_space_image_height);
+        mParallaxImageHeight= mRes.getDimensionPixelSize(R.dimen.parallax_image_height);
+
+        // Create database helper object, image loader object, and utils object
+        mDBhelper       = new DBHelperLocations(this);
+        mImageLoader    = MySingleton.getInstance(this).getImageLoader();
+        mImageLoaderFromDrawable = new ImageLoaderFromDrawable(this, mImageWidth, mImageHeight);
+
+        // Get location id that passed from previous activity
+        mSelectedId     = getIntent().getStringExtra(Utils.ARG_LOCATION_ID);
+
+        // Connect view objects and view ids in xml
+        mImgLocationImage         = (ImageView) findViewById(R.id.image);
+        mPrgLoading               = (CircleProgressBar) findViewById(R.id.prgLoading);
+        mToolbarView              = (Toolbar) findViewById(R.id.toolbar);
+        mTxtDescription           = (HtmlTextView) findViewById(R.id.txtDescription);
+        mTxtLocationName          = (TextView) findViewById(R.id.txtLocationName);
+        mTxtLocationCategory      = (TextView) findViewById(R.id.txtLocationCategory);
+        mTxtLocationDistance      = (TextView) findViewById(R.id.txtLocationDistance);
+        mAdView                   = (AdView) findViewById(R.id.adView);
+        LinearLayout mBtnCall     = (LinearLayout) findViewById(R.id.btnCall);
+        LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
+        LinearLayout mBtnShare    = (LinearLayout) findViewById(R.id.btnShare);
+        ButtonFlat mFlatDirection = (ButtonFlat) findViewById(R.id.flatDirection);
+        mScrollView               = (ObservableScrollView) findViewById(R.id.scroll);
+        SupportMapFragment mMapFragment = ((SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map));
+
+        // Call onMapReady to set up map
+        mMapFragment.getMapAsync(this);
+
+        // Set toolbar as actionbar, set color to transparent, and add navigation up button
+        setSupportActionBar(mToolbarView);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().
+                getColor(R.color.primary_color)));
+
+        // Set listener for some view objects
+        mScrollView.setScrollViewCallbacks(this);
+        mBtnCall.setOnClickListener(this);
+        mBtnWebsite.setOnClickListener(this);
+        mBtnShare.setOnClickListener(this);
+        mFlatDirection.setOnClickListener(this);
+
+        // Set progress circle loading color
+        mPrgLoading.setColorSchemeResources(R.color.accent_color);
+
+        // Get admob visibility value
+        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+
+        // Load ad in background using asynctask class
+        new SyncShowAd(mAdView).execute();
+
+        // Check databases
+        checkDatabase();
+
+        // Get location data from database in background using asyntask class
+        new SyncGetLocations().execute();
+
+    }
+
+    // Method to show snackbar
+    void showSnackBar(String message){
+        new SnackBar.Builder(this)
+                .withMessage(message)
+                .show();
+    }
+
+    // Method to open Google Maps app
+    public void openGoogleMaps(){
+        // Check whether Google App is installed in user device
+        if(isGoogleMapsInstalled())
+        {
+            // If installed, send latitude and longitude value to the app
+            Uri gmmIntentUri = Uri.parse("google.navigation:q="+mLocationLatitude+","+
+                    mLocationLongitude);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            startActivity(mapIntent);
+        }
+        else
+        {
+            // If not installed, display dialog to ask user to install Google Maps app
+            new MaterialDialog.Builder(this)
+                .content(getString(R.string.google_maps_installation))
+                .positiveText(getString(R.string.install))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        try {
+                            // Open Google Maps app page in Google Play app
+                            startActivity(new Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("market://details?id=com.google.android.apps.maps")
+                            ));
+                        } catch (android.content.ActivityNotFoundException anfe) {
+                            startActivity(new Intent(
+                                    // Open Google Maps app page in Google Play web
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=" +
+                                            "com.google.android.apps.maps")
+                            ));
+                        }
+                    }
+                })
+                .show();
+        }
+    }
+
+    // Method to set up map
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+    }
+
+    // Asynctask class to handle load data from database in background
+    public class SyncGetLocations extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // When data still retrieve from database display loading view
+            // and hide other view
+            mPrgLoading.setVisibility(View.VISIBLE);
+            mScrollView.setVisibility(View.GONE);
+            mToolbarView.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // Get data from database
+            getLocationDataFromDatabase(mSelectedId);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            // When finished retrieve data from database, display data to the views
+            mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + "</strong> " +
+                    "<em>" + mLocationAddress + "</em><br /><br />" + mLocationDescription, true);
+            mTxtLocationName.setText(mLocationName);
+            mTxtLocationCategory.setText(mLocationCategory);
+            String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +
+                    getString(R.string.km);
+            mTxtLocationDistance.setText(mFinalDistance);
+
+            if(mLocationImage.toLowerCase().contains("http")){
+                mImageLoader.get(mLocationImage,
+                        com.android.volley.toolbox.ImageLoader.getImageListener(mImgLocationImage,
+                                R.mipmap.empty_photo, R.mipmap.empty_photo));
+
+            } else {
+                int image = getResources().getIdentifier(mLocationImage, "drawable",
+                        getPackageName());
+                mImageLoaderFromDrawable.loadBitmap(image, mImgLocationImage);
+            }
+
+
+            int marker = getResources().getIdentifier(mLocationMarker, "mipmap", getPackageName());
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(Double.valueOf(mLocationLatitude),
+                            Double.valueOf(mLocationLongitude)))
+                    .icon(BitmapDescriptorFactory.fromResource(marker))
+                    .snippet(mLocationAddress)
+                    .title(mLocationName));
+
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(Double.valueOf(mLocationLatitude),
+                            Double.valueOf(mLocationLongitude)),
+                    Utils.ARG_DEFAULT_MAP_ZOOM_LEVEL);
+            mMap.animateCamera(cameraUpdate);
+
+            // Hide loading view and display other views
+            mPrgLoading.setVisibility(View.GONE);
+            mScrollView.setVisibility(View.VISIBLE);
+            mToolbarView.setVisibility(View.VISIBLE);
+
+        }
+    }
+
+    // Asynctask class to load admob in background
+    public class SyncShowAd extends AsyncTask<Void, Void, Void>{
+
+        AdView ad;
+        AdRequest adRequest, interstitialAdRequest;
+        InterstitialAd interstitialAd;
+        int interstitialTrigger;
+
+        public SyncShowAd(AdView ad){
+            this.ad = ad;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check ad visibility. If visible, create adRequest
+            if(mIsAdmobVisible) {
+                // Create an ad request
+                if (Utils.IS_ADMOB_IN_DEBUG) {
+                    adRequest = new AdRequest.Builder().
+                            addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
+                } else {
+                    adRequest = new AdRequest.Builder().build();
+                }
+
+                // When interstitialTrigger equals ARG_TRIGGER_VALUE, display interstitial ad
+                interstitialAd = new InterstitialAd(ActivityDetail.this);
+                interstitialAd.setAdUnitId(ActivityDetail.this.getResources().getString(R.string.interstitial_ad_unit_id));
+                interstitialTrigger = Utils.loadPreferences(getApplicationContext(),
+                        Utils.ARG_TRIGGER);
+                if(interstitialTrigger == Utils.ARG_TRIGGER_VALUE) {
+                    if(Utils.IS_ADMOB_IN_DEBUG) {
+                        interstitialAdRequest = new AdRequest.Builder()
+                                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                                .build();
+                    }else {
+                        interstitialAdRequest = new AdRequest.Builder().build();
+                    }
+                    Utils.savePreferences(getApplicationContext(),Utils.ARG_TRIGGER, 0);
+                }else{
+                    Utils.savePreferences(getApplicationContext(),Utils.ARG_TRIGGER,
+                            (interstitialTrigger+1));
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            // Check ad visibility. If visible, display ad banner and interstitial
+            if(mIsAdmobVisible) {
+                // Start loading the ad
+                ad.loadAd(adRequest);
+                if (interstitialTrigger == Utils.ARG_TRIGGER_VALUE) {
+                    // Start loading the ad
+                    interstitialAd.loadAd(interstitialAdRequest);
+                    // Set the AdListener
+                    interstitialAd.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdLoaded() {
+                            if (interstitialAd.isLoaded()) {
+                                interstitialAd.show();
+                            }
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(int errorCode) {}
+
+                        @Override
+                        public void onAdClosed() {}
+                    });
+                }
+            }
+
+        }
+    }
+
+    // Method to retrieve data from database
+    public void getLocationDataFromDatabase(String id) {
+        ArrayList<Object> row = mDBhelper.getLocationDetailById(id);
+
+        mLocationName           = row.get(0).toString();
+        mLocationAddress        = row.get(1).toString();
+        mLocationDescription    = row.get(2).toString();
+        mLocationImage          = row.get(3).toString();
+        mLocationLatitude       = row.get(4).toString();
+        mLocationLongitude      = row.get(5).toString();
+        mLocationDescription    = row.get(6).toString();
+        mLocationPhone          = row.get(7).toString();
+        mLocationWebsite        = row.get(8).toString();
+        mLocationMarker         = row.get(9).toString();
+        mLocationCategory       = row.get(10).toString();
+
+        // Get distance between user position and location
+        Location.distanceBetween(Double.valueOf(row.get(4).toString()),
+                Double.valueOf(row.get(5).toString()),
+                ActivityHome.mCurrentLatitude, ActivityHome.mCurrentLongitude, mDistance);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        onScrollChanged(mScrollView.getCurrentScrollY(), false, false);
+    }
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+        int baseColor = getResources().getColor(R.color.primary_color);
+        float alpha = Math.min(1, (float) scrollY / mParallaxImageHeight);
+        mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
+        ViewHelper.setTranslationY(mImgLocationImage, scrollY / 2);
+        // When scroll reach top screen, than display location name
+        // on toolbar, else hide them
+        if(alpha == 1){
+            mToolbarView.setTitle(mLocationName);
+        }else{
+            mToolbarView.setTitle("");
+        }
+    }
+
+    // Method to check database
+    private void checkDatabase(){
+        // Create object of database helpers
+        mDBhelper = new DBHelperLocations(this);
+
+        // Create database
+        try {
+            mDBhelper.createDataBase();
+        }catch(IOException ioe){
+            throw new Error("Unable to create database");
+        }
+
+        // Open database
+        mDBhelper.openDataBase();
+    }
+
+    // Method to check whether Google Maps app is installed in user device
+    public boolean isGoogleMapsInstalled()
+    {
+        try
+        {
+            ApplicationInfo info = getPackageManager().getApplicationInfo(
+                    "com.google.android.apps.maps", 0 );
+            Log.d(Utils.TAG_PONGODEV + TAG,"info= "+info);
+            return true;
+        }
+        catch(PackageManager.NameNotFoundException e)
+        {
+            return false;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.btnCall:
+                makeACall();
+                break;
+            case R.id.btnWebsite:
+                // If website address is not available display snackbar,
+                // else open browser to access website
+                if(mLocationWebsite.equals("-")){
+                    showSnackBar(getString(R.string.no_website_available));
+                }else {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                    browserIntent.setData(Uri.parse(mLocationWebsite));
+                    startActivity(browserIntent);
+                }
+                break;
+            case R.id.btnShare:
+                // Share location info to other apps
+                String message = mLocationAddress+"\n"+getString(R.string.phone)+" "+mLocationPhone+
+                        "\n"+mLocationWebsite+"\n\n"+getString(R.string.sent_via_message)+" "+
+                        getString(R.string.app_name)+". "+getString(R.string.download)+" "+getString(R.string.app_name)+
+                        " "+getString(R.string.at)+" "+getString(R.string.google_play_url);
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mLocationName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+                startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share_to)));
+                break;
+            case R.id.flatDirection:
+                new MaterialDialog.Builder(this)
+                .title(R.string.open_with)
+                .items(R.array.app_list)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which,
+                                            CharSequence text) {
+                        switch (which) {
+                            case 0:
+                                // Send location latitude and longitude to Google Maps app
+                                openGoogleMaps();
+                                break;
+                            case 1:
+                                // Or use ArtGo to get direction from user position to the location
+                                Intent directionIntent = new Intent(ActivityDetail.this, ActivityDirection.class);
+                                directionIntent.putExtra(Utils.ARG_LOCATION_NAME, mLocationName);
+                                directionIntent.putExtra(Utils.ARG_LOCATION_ADDRESSES, mLocationAddress);
+                                directionIntent.putExtra(Utils.ARG_LOCATION_LATITUDE, mLocationLatitude);
+                                directionIntent.putExtra(Utils.ARG_LOCATION_LONGITUDE, mLocationLongitude);
+                                directionIntent.putExtra(Utils.ARG_LOCATION_MARKER, mLocationMarker);
+                                startActivity(directionIntent);
+                                overridePendingTransition(R.anim.open_next, R.anim.close_main);
+                                break;
+                        }
+                    }
+                }).show();
+                break;
+        }
+    }
+
+    private void makeACall(){
+        // If phone number is not available display snackbar,
+        // else make a phone call
+        if(mLocationPhone.equals("-")){
+            showSnackBar(getString(R.string.no_phone_available));
+        }else {
+            if (!mayRequestCallPhone()) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= 8) {
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + mLocationPhone));
+                try{
+                    startActivity(callIntent);
+                }catch (SecurityException e){
+                    Log.d(Utils.TAG_PONGODEV + TAG,""+e.toString());
+                }
+                Log.d(Utils.TAG_PONGODEV + TAG, "start calling");
+            }
+        }
+    }
+    // Implement permissions requests on apps that target API level 23 or higher, and are
+    // running on a device that's running Android 6.0 (API level 23) or higher.
+    // If the device or the app's targetSdkVersion is 22 or lower, the system prompts the user
+    // to grant all dangerous permissions when they install or update the app.
+    private boolean mayRequestCallPhone() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+
+        // If already choose deny once
+        if (shouldShowRequestPermissionRationale(CALL_PHONE)) {
+            askPermissionDialog();
+        } else {
+            requestPermissions(new String[]{CALL_PHONE}, REQUEST_CALL_PHONE);
+        }
+        return false;
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CALL_PHONE) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay! Do the
+                // Call Phone-related task you need to do.
+                makeACall();
+                Log.d(Utils.TAG_PONGODEV + TAG, "Request Call Phone Allowed");
+            } else {
+                // permission was not granted
+                if (getApplicationContext() == null) {
+                    return;
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (shouldShowRequestPermissionRationale(CALL_PHONE)) {
+                        makeACall();
+                    } else {
+                        permissionSettingDialog();
+                    }
+                }
+            }
+        }
+    }
+
+    // Method to display share dialog
+    private void askPermissionDialog(){
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+            .backgroundColorRes(R.color.material_background_color)
+            .titleColorRes(R.color.primary_text)
+            .contentColorRes(R.color.primary_text)
+            .positiveColorRes(R.color.accent_color)
+            .negativeColorRes(R.color.accent_color)
+            .title(R.string.permission)
+            .content(R.string.request_call_phone)
+            .positiveText(R.string.open_permission)
+            .negativeText(android.R.string.cancel)
+            .cancelable(false)
+            .callback(new MaterialDialog.ButtonCallback() {
+                @TargetApi(Build.VERSION_CODES.M)
+                @Override
+                public void onPositive(MaterialDialog dialog) {
+                    requestPermissions(new String[]{CALL_PHONE}, REQUEST_CALL_PHONE);
+                }
+
+                @Override
+                public void onNegative(MaterialDialog dialog) {
+                    // Close dialog when Cancel button clicked
+                    dialog.dismiss();
+                }
+            }).build();
+
+        // Show dialog
+        dialog.show();
+
+    }
+
+    // Method to display setting dialog
+    private void permissionSettingDialog(){
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+            .backgroundColorRes(R.color.material_background_color)
+            .titleColorRes(R.color.primary_text)
+            .contentColorRes(R.color.primary_text)
+            .positiveColorRes(R.color.accent_color)
+            .negativeColorRes(R.color.accent_color)
+            .title(R.string.permission)
+            .content(R.string.request_call_permission)
+            .positiveText(R.string.open_setting)
+            .negativeText(android.R.string.cancel)
+            .cancelable(false)
+            .callback(new MaterialDialog.ButtonCallback() {
+                @Override
+                public void onPositive(MaterialDialog dialog) {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getApplicationContext().
+                            getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                }
+                @Override
+                public void onNegative(MaterialDialog dialog) {
+                    // Close dialog when Cancel button clicked
+                    dialog.dismiss();
+                }
+            }).build();
+        // Show dialog
+        dialog.show();
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+    }
+
+
+    // Method to handle physical back button
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // Call transition when physical back button pressed
+        overridePendingTransition(R.anim.open_main, R.anim.close_next);
+    }
+
+    /** Called when returning to the activity */
+    @Override
+    public void onResume() {
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+        super.onResume();
+    }
+
+    /** Called before the activity is destroyed */
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
+    }
+
+}

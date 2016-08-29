@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="standard_margin">16dp</dimen>
+
+    <!-- text sizes -->
+    <dimen name="headline">24sp</dimen>
+    <dimen name="title">20sp</dimen>
+    <dimen name="subhead">16sp</dimen>
+    <dimen name="body_1">14sp</dimen>
+    <dimen name="display_3">56sp</dimen>
+    <dimen name="line_spacing_body">3dp</dimen>
+
+    <!-- other sizes -->
+    <dimen name="thumb_width">72dp</dimen>
+    <dimen name="thumb_height">72dp</dimen>
+    <dimen name="thumb_margin_left">5dp</dimen>
+    <dimen name="thumb_margin_bottom">5dp</dimen>
+    <dimen name="thumb_border_width">1dp</dimen>
+    <dimen name="item_padding_left_with_icon_small">75dp</dimen>
+    <dimen name="item_padding_right_with_fab">100dp</dimen>
+    <dimen name="thumb_width_small">24dp</dimen>
+    <dimen name="thumb_height_small">24dp</dimen>
+    <dimen name="item_padding_with_icon">111dp</dimen>
+    <dimen name="item_twoline_height">96dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="flexible_space_image_height">320dp</dimen>
+    <dimen name="parallax_image_height">180dp</dimen>
+    <dimen name="parallax_image_plus_toolbar_height">252dp</dimen>
+    <dimen name="circleprogressbar_width">60dp</dimen>
+    <dimen name="circleprogressbar_height">60dp</dimen>
+    <dimen name="title_margin_top">48dp</dimen>
+
+    <!-- distance label sizes -->
+    <dimen name="distance_label_radius">10dp</dimen>
+    <dimen name="distance_label_padding_vertical">5dp</dimen>
+    <dimen name="distance_label_padding_horizontal">1dp</dimen>
+
+    <!-- Card sizes -->
+    <dimen name="card_margin">8dp</dimen>
+    <dimen name="card_radius">2dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+</resources>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/lytAdapter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/item_twoline_height"
+            android:background="@color/material_background_color">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/standard_margin">
+                <!-- Location image -->
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/imgLocationImage"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="@dimen/thumb_width"
+                    android:layout_height="@dimen/thumb_height"
+                    android:scaleType="centerCrop"
+                    android:layout_marginLeft="@dimen/thumb_margin_left"
+                    android:layout_marginBottom="@dimen/thumb_margin_bottom"
+                    app:riv_mutate_background="true"
+                    app:riv_border_color="@color/divider_color"
+                    app:riv_border_width="@dimen/thumb_border_width"
+                    app:riv_oval="true"/>
+            </FrameLayout>
+
+            <!-- Location name and address -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/item_padding_with_icon"
+                android:paddingRight="@dimen/item_padding_left_with_icon_small"
+                android:paddingTop="@dimen/standard_margin"
+                android:paddingBottom="@dimen/standard_margin"
+                android:layout_centerVertical="true">
+                <TextView
+                    android:id="@+id/txtLocationName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/title"
+                    android:textColor="@color/primary_text"
+                    android:ellipsize="end"
+                    android:singleLine="true"/>
+                <TextView
+                    android:id="@+id/txtLocationAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/subhead"
+                    android:textColor="@color/secondary_text"
+                    android:layout_below="@+id/txtRecipeName"
+                    android:ellipsize="end"
+                    android:singleLine="true"/>
+            </LinearLayout>
+
+            <!-- Location distance -->
+            <TextView
+                android:id="@+id/txtLocationDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/subhead"
+                android:textColor="@color/text_and_icon_color"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/rounded_background"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:layout_marginRight="@dimen/standard_margin"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+</RelativeLayout>

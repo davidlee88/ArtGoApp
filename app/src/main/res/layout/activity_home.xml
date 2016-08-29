@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/window_background_color">
+
+    <!-- Toolbar with spinner -->
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/primary_color"
+        android:titleTextAppearance="@color/text_and_icon_color"
+        app:popupTheme="@style/Theme.AppCompat">
+        <Spinner
+            android:id="@+id/spnCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize" />
+    </android.support.v7.widget.Toolbar>
+
+    <!-- Admob banner -->
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id"
+        android:background="@color/window_background_color"
+        android:layout_below="@+id/toolbar">
+    </com.google.android.gms.ads.AdView>
+
+
+    <!-- Map content -->
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@+id/adView"/>
+
+    <!-- Location list -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/adView"
+        android:background="@color/window_background_color"
+        android:visibility="gone"/>
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/prgLoading"
+        android:layout_width="@dimen/circleprogressbar_width"
+        android:layout_height="@dimen/circleprogressbar_height"
+        android:layout_centerInParent="true"
+        app:mlpb_enable_circle_background="true"
+        android:visibility="gone"/>
+
+    <!-- Fab map type button -->
+    <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabLayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fabLocation"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/standard_margin"
+        app:fab_icon="@mipmap/ic_layers_grey600_36dp"
+        app:fab_colorNormal="@color/material_background_color"
+        app:fab_colorPressed="@color/light_primary_color"/>
+
+    <!-- Fab my location button -->
+    <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:layout_marginRight="@dimen/standard_margin"
+        app:fab_icon="@mipmap/ic_my_location_white_36dp"
+        app:fab_colorNormal="@color/accent_color"
+        app:fab_colorPressed="@color/light_primary_color"/>
+
+</RelativeLayout>

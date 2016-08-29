@@ -1,0 +1,105 @@
+<resources>
+    <!-- App name -->
+    <string name="app_name">ArtGo</string>
+
+    <!-- Item menu name -->
+    <string name="action_about">About</string>
+    <string name="action_view">View</string>
+
+    <!-- Screen title -->
+    <string name="about">About</string>
+    <string name="direction">Direction</string>
+
+    <!-- Additional category -->
+    <string name="all_places">All Places</string>
+
+    <!-- Action buttons -->
+    <string name="call">CALL</string>
+    <string name="website">WEBSITE</string>
+    <string name="share">SHARE</string>
+    <string name="open_permission">OPEN PERMISSION</string>
+    <string name="open_setting">OPEN SETTING</string>
+    <string name="close_app">CLOSE APP</string>
+
+    <!-- DO NOT change preferences key below -->
+    <string name="pref_share_key">prefShareKey</string>
+    <string name="pref_rate_review_key">prefRateReviewKey</string>
+
+    <!-- preferences value of about preferences page -->
+    <string name="pref_app_title">Application Name</string>
+    <string name="pref_app_summary">ArtGo</string>
+    <string name="pref_version_title">Build Version</string>
+    <string name="pref_version_summary">Version 3.1</string>
+    <string name="pref_developer_title">Developer</string>
+    <string name="pref_developer_summary">OMGDynamic</string>
+    <string name="pref_copyright_title">Copyright</string>
+    <string name="pref_copyright_summary">Copyright 2016 OMGDynamic. All rights reserved</string>
+    <string name="pref_share_title">Tell a Friend</string>
+    <string name="pref_share_summary">Tell your friend about this app</string>
+    <string name="pref_rate_review_title">Rate &amp; Review</string>
+    <string name="pref_rate_review_summary">Rate and review this app if you think it is awesome</string>
+
+    <!-- Sharing content -->
+    <string name="share_to">Share to</string>
+    <string name="permission">Permission</string>
+    <string name="subject">Perfect app to not get lost in the city</string>
+    <string name="message"> is city app that will help you explore the city. Download it at </string>
+    <string name="open_with">Open with:</string>
+    <string name="phone">Phone:</string>
+    <string name="sent_via_message">This message was sent from</string>
+    <string name="download">Download</string>
+    <string name="at">at</string>
+    <string name="request_location">ArtGo need to access device\'s location</string>
+    <string name="request_location_permission">ArtGo need to access device\'s location.
+        Select Settings - Apps - ArtGo - Select Permissions - Enable the permission.</string>
+    <string name="request_call_permission">ArtGo need to access device\'s call phone.
+        Select Settings - Apps - ArtGo - Select Permissions - Enable the permission.</string>
+    <string name="path_permission">Select Settings - Apps - ArtGo - Select Permissions - Enable the permission.</string>
+
+    <string name="request_call_phone">ArtGo need to access device\'s call phone</string>
+
+    <!-- Map and direction content -->
+    <string name="google_maps_installation">Google Maps is not installed. Install Google Maps?</string>
+    <string name="install">Install</string>
+    <string name="address">Address</string>
+    <string name="km">km</string>
+    <string name="getting_user_position">Getting user position&#8230;</string>
+    <string name="getting_direction">Getting direction&#8230;</string>
+    <string name="loading_data">Loading data&#8230;</string>
+    <string name="get_direction">Get Direction</string>
+    <string name="play_services_available">Google Play services is available</string>
+    <array name="app_list">
+        <item>Google Maps</item>
+        <item>ArtGo</item>
+    </array>
+
+    <!-- Google Play url. Change your.package.name with your own package name. -->
+    <string name="google_play_url">https://play.google.com/store/apps/details?id=your.package.name</string>
+
+    <!-- Banner ad id. Insert your own banner id, you can get banner id via admob. -->
+    <string name="banner_ad_unit_id">BANNER_AD_UNIT_ID</string>
+
+    <!-- Interstitial ad id. Insert your own interstitial id, you can get interstitial id via admob. -->
+    <string name="interstitial_ad_unit_id">INTERSTITIAL_AD_UNIT_ID</string>
+
+    <!-- Snackbar message -->
+    <string name="select">Select</string>
+    <string name="distance_alert">Your position is out of range. This app will use default position.</string>
+    <string name="gps_not_enabled_alert">GPS is not enabled. This app will use default position.</string>
+    <string name="no_phone_available">This place does not have phone number.</string>
+    <string name="no_website_available">This place does not have website address.</string>
+    <string name="unable_to_get_direction">Unable to get direction from your position.</string>
+
+    <!-- Map layer types -->
+    <string name="dialog_map_type_title">Map Types</string>
+    <array name="map_types">
+        <item>Normal</item>
+        <item>Satellite</item>
+        <item>Hybrid</item>
+        <item>Terrain</item>
+    </array>
+
+
+    <!-- ripple duration -->
+    <integer name="ripple_duration">30</integer>
+</resources>

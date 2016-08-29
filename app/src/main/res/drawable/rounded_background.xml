@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/accent_color" />
+    <corners android:radius="@dimen/distance_label_radius" />
+    <padding
+        android:bottom="@dimen/distance_label_padding_horizontal"
+        android:left="@dimen/distance_label_padding_vertical"
+        android:right="@dimen/distance_label_padding_vertical"
+        android:top="@dimen/distance_label_padding_horizontal" />
+</shape>
