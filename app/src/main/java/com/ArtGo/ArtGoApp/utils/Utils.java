@@ -49,7 +49,7 @@ public class Utils {
     public static final int ARG_TRIGGER_VALUE = 3;
 
     // Admob visibility parameter. Set true to show admob and false to hide.
-    public static final boolean IS_ADMOB_VISIBLE = true;
+    public static final boolean IS_ADMOB_VISIBLE = false;
 
     // Set value to true if you are still in development process, and false if you are ready to publish the app.
     public static final boolean IS_ADMOB_IN_DEBUG = false;

@@ -25,7 +25,7 @@
     </android.support.v7.widget.Toolbar>
 
     <!-- Admob banner -->
-    <com.google.android.gms.ads.AdView
+   <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

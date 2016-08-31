@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import static android.Manifest.permission.CALL_PHONE;
 
 /**
- * Design and developed by pongodev.com
+ *
  *
  * ActivityDetail is created to display location detail.
  * Created using ActivityBase.
@@ -151,10 +151,10 @@ public class ActivityDetail extends ActivityBase implements
         mPrgLoading.setColorSchemeResources(R.color.accent_color);
 
         // Get admob visibility value
-        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+        //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        new SyncShowAd(mAdView).execute();
+        //new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();

@@ -71,7 +71,7 @@ import java.util.HashMap;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
- * Design and developed by pongodev.com
+ *
  *
  * ActivityHome is created to display locations data in map view and list view.
  * Created using AppCompatActivity.
@@ -209,10 +209,10 @@ public class ActivityHome extends AppCompatActivity
         mPrgLoading.setColorSchemeResources(R.color.accent_color);
 
         // Get admob visibility value
-        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+        //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        new SyncShowAd(mAdView).execute();
+        //new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();
