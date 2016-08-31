@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.ArtGo.ArtGoApp.utils.RestClient;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.mrengineer13.snackbar.SnackBar;
 import com.google.android.gms.ads.AdRequest;
@@ -61,8 +62,11 @@ import com.ArtGo.ArtGoApp.fragments.FragmentDialogError;
 import com.ArtGo.ArtGoApp.listeners.OnTapListener;
 import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
 import com.ArtGo.ArtGoApp.utils.Utils;
-
+import com.ArtGo.ArtGoApp.utils.RestClient;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -209,10 +213,10 @@ public class ActivityHome extends AppCompatActivity
         mPrgLoading.setColorSchemeResources(R.color.accent_color);
 
         // Get admob visibility value
-        //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        //new SyncShowAd(mAdView).execute();
+        new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();
@@ -221,7 +225,8 @@ public class ActivityHome extends AppCompatActivity
         mAdapter = new AdapterLocations(this);
 
         // Get category data
-        new SyncGetCategories().execute();
+        //new SyncGetCategories().execute();
+        new SyncGetTypes().execute();
 
         // Build Google API client. Check if Google play services is available and get user position.
         buildGoogleApiClient();
@@ -867,9 +872,40 @@ public class ActivityHome extends AppCompatActivity
             }).positiveText(R.string.select)
             .show();
     }
+    //sync method to get types of locations
+    public class SyncGetTypes extends AsyncTask<Void, Void, Void>{
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Clear arraylist variable first before used
+            mCategoryIds.clear();
+            mCategoryNames.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Get category data from RestClient
+            getCategoryFromRestServer();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            // Set category data to spinner
+            ArrayAdapter<String> categoryAdapter;
+            categoryAdapter = new ArrayAdapter<>(
+                    getApplicationContext(),
+                    R.layout.layout_spinner,
+                    mCategoryNames
+            );
+            categoryAdapter.setDropDownViewResource(R.layout.layout_spinner);
+            mSpnCategory.setAdapter(categoryAdapter);
+        }
+    }
     // Asynctask class to get category data from database
-    public class SyncGetCategories extends AsyncTask<Void, Void, Void>{
+   /* public class SyncGetCategories extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected void onPreExecute() {
@@ -899,10 +935,10 @@ public class ActivityHome extends AppCompatActivity
             categoryAdapter.setDropDownViewResource(R.layout.layout_spinner);
             mSpnCategory.setAdapter(categoryAdapter);
         }
-    }
+    }*/
 
     // Method to get data from database
-    public void getCategoryFromDatabase(){
+    /*public void getCategoryFromDatabase(){
         ArrayList<ArrayList<Object>> dataCategory = mDBHelper.getAllCategoriesData();
 
         // Ad "All Places" in first row
@@ -913,6 +949,24 @@ public class ActivityHome extends AppCompatActivity
 
             mCategoryIds.add(row.get(0).toString());
             mCategoryNames.add(row.get(1).toString());
+        }
+    }*/
+
+    //Method to get data from Rest Server
+    public void getCategoryFromRestServer(){
+        JSONArray locationType = RestClient.getAllCategoriesData();
+
+        // Ad "All Places" in first row
+        mCategoryIds.add("0");
+        mCategoryNames.add(getString(R.string.all_places));
+        for(int i = 0; i< locationType.length(); i++){
+            try{
+                JSONObject row = locationType.getJSONObject(i);
+                mCategoryIds.add(row.get("id").toString());
+                mCategoryNames.add(row.get("name").toString());
+        }catch (Exception e){
+
+            }
         }
     }
 
@@ -943,7 +997,7 @@ public class ActivityHome extends AppCompatActivity
                 e.printStackTrace();
             }
             // Get data from database
-            getLocationDataFromDatabase();
+            getLocationDataFromRestClient();
             return null;
         }
 
@@ -970,7 +1024,7 @@ public class ActivityHome extends AppCompatActivity
     }
 
     // Method to retrieve locations data from database
-    private void getLocationDataFromDatabase(){
+    /*private void getLocationDataFromDatabase(){
         // Clear arraylist variables first before storing data
         mLocationIds.clear();
         mLocationNames.clear();
@@ -1011,6 +1065,57 @@ public class ActivityHome extends AppCompatActivity
 
         // Sort data base on distance between location and user position
         sortDataByDistance();
+
+    }*/
+
+    private void getLocationDataFromRestClient(){
+        // Clear arraylist variables first before storing data
+        mLocationIds.clear();
+        mLocationNames.clear();
+        mLocationImages.clear();
+        mLocationAddresses.clear();
+        mLocationLatitudes.clear();
+        mLocationLongitudes.clear();
+        mLocationDistances.clear();
+        mLocationMarkers.clear();
+        mLocationDistancesString.clear();
+
+        // Store data to arraylist variables
+       JSONArray locations = RestClient.getLocationsByCategory(mSelectedCategoryId);
+        float[] distances = new float[1];
+
+        for(int i = 0; i< locations.length(); i++) {
+            try {
+                JSONObject row = locations.getJSONObject(i);
+                mLocationIds.add(row.get("id").toString());
+                mLocationNames.add(row.get("name").toString());
+                mLocationAddresses.add(row.get("address").toString());
+                mLocationImages.add(row.get("image").toString());
+                String[] parts = row.get("geolocation").toString().split(",");
+                String part1 = parts[0].replace("(", "");
+                String part2 = parts[1].replace(")", "");
+                mLocationLatitudes.add(part1);
+                mLocationLongitudes.add(part2);
+                mLocationMarkers.add(row.get("marker").toString());
+                // Check distance between locations and user position first
+                Location.distanceBetween(Double.valueOf(part1),
+                        Double.valueOf(part2),
+                        mCurrentLatitude, mCurrentLongitude, distances);
+
+                float paramDistance = (distances[0] / 1000);
+                mLocationDistances.add(paramDistance);
+
+                // For trigger variable mLocationDistancesString
+                mLocationDistancesString.add(String.format("%.2f", paramDistance));
+
+            } catch (Exception e) {
+
+            }
+        }
+            // Sort data base on distance between location and user position
+            sortDataByDistance();
+
+
 
     }
 

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ArtGo.ArtGoApp.utils.RestClient;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.toolbox.ImageLoader;
 import com.gc.materialdesign.views.ButtonFlat;
@@ -47,6 +48,7 @@ import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
 import com.ArtGo.ArtGoApp.utils.MySingleton;
 import com.ArtGo.ArtGoApp.utils.Utils;
 
+import org.json.JSONObject;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
@@ -151,10 +153,10 @@ public class ActivityDetail extends ActivityBase implements
         mPrgLoading.setColorSchemeResources(R.color.accent_color);
 
         // Get admob visibility value
-        //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        //new SyncShowAd(mAdView).execute();
+        new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();
@@ -243,7 +245,7 @@ public class ActivityDetail extends ActivityBase implements
                 e.printStackTrace();
             }
             // Get data from database
-            getLocationDataFromDatabase(mSelectedId);
+            getLocationDataFromRest(mSelectedId);
             return null;
         }
 
@@ -378,7 +380,7 @@ public class ActivityDetail extends ActivityBase implements
     }
 
     // Method to retrieve data from database
-    public void getLocationDataFromDatabase(String id) {
+    /*public void getLocationDataFromDatabase(String id) {
         ArrayList<Object> row = mDBhelper.getLocationDetailById(id);
 
         mLocationName           = row.get(0).toString();
@@ -398,6 +400,32 @@ public class ActivityDetail extends ActivityBase implements
                 Double.valueOf(row.get(5).toString()),
                 ActivityHome.mCurrentLatitude, ActivityHome.mCurrentLongitude, mDistance);
 
+    }*/
+
+    public void getLocationDataFromRest(String id) {
+        JSONObject row = RestClient.getLocationDetailById(id);
+        try {
+            mLocationName = row.get("name").toString();
+            mLocationAddress = row.get("address").toString();
+            mLocationDescription = row.get("description").toString();
+            mLocationImage = row.get("image").toString();
+            String[] parts = row.get("geolocation").toString().split(",");
+            String part1 = parts[0].replace("(","");
+            String part2 = parts[1].replace(")","");
+            mLocationLatitude = part1;
+            mLocationLongitude = part2;
+            mLocationPhone = "";
+            mLocationWebsite = "";
+            mLocationMarker = row.get("marker").toString();
+            mLocationCategory = row.get("typename").toString();
+
+            // Get distance between user position and location
+            Location.distanceBetween(Double.valueOf(mLocationLatitude),
+                    Double.valueOf(mLocationLongitude),
+                    ActivityHome.mCurrentLatitude, ActivityHome.mCurrentLongitude, mDistance);
+        }catch (Exception e){
+
+        }
     }
 
     @Override

@@ -18,11 +18,48 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class RestClient {
 
-    private static final String BASE_URI = "microsoft-apiapp95aeaaf2c782424e88fb244f90cafcd9.azurewebsites.net/api/Locations";
-    private static URL url;
+    private static final String BASE_URI = "https://microsoft-apiapp95aeaaf2c782424e88fb244f90cafcd9.azurewebsites.net/api/Locations";
+    //private static URL url;
 
+    public static JSONArray getAllCategoriesData() {
+        URL url;
+        JSONArray response = new JSONArray();
+        BufferedReader reader = null;
+        String requestURL = BASE_URI + "/getTypes";
+        HttpURLConnection conn = null;
+        try {
+            url = new URL(requestURL);
+            conn = (HttpsURLConnection) url.openConnection();
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
 
-    public static JSONArray getLocationsByCategory(int typeId) {
+                InputStream stream = conn.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String textResult = "";
+                while ((textResult = reader.readLine()) != null) {
+                    buffer.append(textResult);
+                }
+                String finalJson = buffer.toString();
+                response = new JSONArray(finalJson);
+            } else {
+                response = null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+        return response;
+    }
+
+    public static JSONArray getLocationsByCategory(String typeId) {
         URL url;
         JSONArray response = new JSONArray();
         BufferedReader reader = null;
@@ -60,7 +97,7 @@ public class RestClient {
         return response;
     }
 
-    public static JSONObject getLocationDetailById(int id) {
+    public static JSONObject getLocationDetailById(String id) {
         URL url;
         JSONObject response = new JSONObject();
         BufferedReader reader = null;

@@ -29,9 +29,9 @@
     <string name="pref_app_title">Application Name</string>
     <string name="pref_app_summary">ArtGo</string>
     <string name="pref_version_title">Build Version</string>
-    <string name="pref_version_summary">Version 3.1</string>
+    <string name="pref_version_summary">Version 1.0</string>
     <string name="pref_developer_title">Developer</string>
-    <string name="pref_developer_summary">OMGDynamic</string>
+    <string name="pref_developer_summary">Moaoran Li</string>
     <string name="pref_copyright_title">Copyright</string>
     <string name="pref_copyright_summary">Copyright 2016 OMGDynamic. All rights reserved</string>
     <string name="pref_share_title">Tell a Friend</string>
