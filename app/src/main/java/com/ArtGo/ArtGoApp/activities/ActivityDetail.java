@@ -92,7 +92,7 @@ public class ActivityDetail extends ActivityBase implements
     // Create variables to store location data
     private String mLocationName, mLocationAddress, mLocationImage,
             mLocationLongitude, mLocationLatitude, mLocationDescription, mLocationPhone,
-            mLocationWebsite, mLocationMarker, mLocationCategory;
+            mLocationWebsite, mLocationMarker, mLocationCategory,mLocationAuthor,mLocationDate,mLocationStructure;
 
     // Create float array variable to store distance between location and user position
     private float[] mDistance = new float[1];
@@ -124,7 +124,7 @@ public class ActivityDetail extends ActivityBase implements
         mTxtLocationName          = (TextView) findViewById(R.id.txtLocationName);
         mTxtLocationCategory      = (TextView) findViewById(R.id.txtLocationCategory);
         mTxtLocationDistance      = (TextView) findViewById(R.id.txtLocationDistance);
-        mAdView                   = (AdView) findViewById(R.id.adView);
+        //mAdView                   = (AdView) findViewById(R.id.adView);
         LinearLayout mBtnCall     = (LinearLayout) findViewById(R.id.btnCall);
         LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
         LinearLayout mBtnShare    = (LinearLayout) findViewById(R.id.btnShare);
@@ -153,10 +153,10 @@ public class ActivityDetail extends ActivityBase implements
         mPrgLoading.setColorSchemeResources(R.color.accent_color);
 
         // Get admob visibility value
-        mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
+        //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        new SyncShowAd(mAdView).execute();
+        //new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();
@@ -254,8 +254,9 @@ public class ActivityDetail extends ActivityBase implements
             super.onPostExecute(aVoid);
 
             // When finished retrieve data from database, display data to the views
-            mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + "</strong> " +
-                    "<em>" + mLocationAddress + "</em><br /><br />" + mLocationDescription, true);
+            mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + "</strong>  " +
+                    "<em>" + mLocationAddress + "</em><br /><strong>"+getString(R.string.author)+"</strong>  <em>"+mLocationAuthor+"</em><br />" +
+                    "<strong>"+getString(R.string.date)+"</strong>  <em>"+mLocationDate+"</em><br /><strong>"+getString(R.string.structure)+"</strong>  <em>"+mLocationStructure+"</em><br /><br />" + mLocationDescription, true);
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
             String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +
@@ -418,6 +419,11 @@ public class ActivityDetail extends ActivityBase implements
             mLocationWebsite = "";
             mLocationMarker = row.get("marker").toString();
             mLocationCategory = row.get("typename").toString();
+            mLocationAuthor = row.get("author").toString();
+            String[] dates = row.get("date").toString().split("-");
+            String year = dates[0];
+            mLocationDate = year;
+            mLocationStructure = row.get("structure").toString();
 
             // Get distance between user position and location
             Location.distanceBetween(Double.valueOf(mLocationLatitude),

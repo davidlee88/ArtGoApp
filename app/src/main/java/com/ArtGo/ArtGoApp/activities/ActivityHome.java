@@ -62,7 +62,6 @@ import com.ArtGo.ArtGoApp.fragments.FragmentDialogError;
 import com.ArtGo.ArtGoApp.listeners.OnTapListener;
 import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
 import com.ArtGo.ArtGoApp.utils.Utils;
-import com.ArtGo.ArtGoApp.utils.RestClient;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
@@ -216,7 +215,7 @@ public class ActivityHome extends AppCompatActivity
         mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
 
         // Load ad in background using asynctask class
-        new SyncShowAd(mAdView).execute();
+        //new SyncShowAd(mAdView).execute();
 
         // Check databases
         checkDatabase();

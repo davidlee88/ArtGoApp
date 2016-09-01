@@ -62,6 +62,9 @@
     <string name="google_maps_installation">Google Maps is not installed. Install Google Maps?</string>
     <string name="install">Install</string>
     <string name="address">Address</string>
+    <string name="author">Artist</string>
+    <string name="date">Made Year</string>
+    <string name="structure">Structure</string>
     <string name="km">km</string>
     <string name="getting_user_position">Getting user position&#8230;</string>
     <string name="getting_direction">Getting direction&#8230;</string>
