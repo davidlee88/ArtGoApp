@@ -1,14 +1,13 @@
 package com.ArtGo.ArtGoApp.utils;
 
-import com.google.android.gms.common.internal.zzab;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.internal.zzf;
 import com.google.maps.android.clustering.ClusterItem;
 
 /**
  * Created by MoaoranLi on 2016/9/2.
  */
+
 public class MyItem implements ClusterItem {
     private String id;
     private final LatLng mPosition;

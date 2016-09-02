@@ -1126,7 +1126,7 @@ public class ActivityHome extends AppCompatActivity
 
     }
 
-    // Method to set up location markers
+    // Method to set up location markers in clusters
     private void setupMarker(){
         // Clear map before displaying marker
         mMap.clear();
@@ -1148,15 +1148,19 @@ public class ActivityHome extends AppCompatActivity
                     .icon(BitmapDescriptorFactory.fromResource(marker))
                     .snippet(mLocationAddresses.get(i))
                     .title(mLocationNames.get(i)));*/
+
+            //set up markers and pass marker value to ClusterManager object
             String id = Integer.toString(i);
+            //Create a MyItem object to store Marker info
             MyItem item = new MyItem(id,new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
                     Double.valueOf(mLocationLongitudes.get(i))),
                     mLocationNames.get(i),
                     mLocationAddresses.get(i),
                     BitmapDescriptorFactory.fromResource(marker));
+            //Add Items to ClusterManager object
             mClusterManager.addItem(item);
             mLocationIdsOnMarkers.put(item.getId(), mLocationIds.get(i));
-
+            //Info window click listener
             mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> (){
                 @Override
                 public void onClusterItemInfoWindowClick(MyItem item) {
@@ -1175,10 +1179,12 @@ public class ActivityHome extends AppCompatActivity
             });*/
 
         }
+        //To use own icon style in clusterManager
         mClusterManager.setRenderer(new OwnIconRendered(this, mMap, mClusterManager));
 
     }
 
+    //Method to load location detail in other page
     private void loadDetail(String id){
         Intent detailIntent = new Intent(this, ActivityDetail.class);
         detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);

@@ -35,7 +35,7 @@ public class Utils {
     // Set default max distance between current user position and default user position
     public static final float ARG_MAX_DISTANCE = (float) 100.0; // In kilometers
     // Set default map zoom level. Set value from 1 to 17
-    public static final int ARG_DEFAULT_MAP_ZOOM_LEVEL = 14;
+    public static final int ARG_DEFAULT_MAP_ZOOM_LEVEL = 11;
 
     // Set default map type. 0 is normal, 1, is hybrid, 2, is satellite, and 3 is terrain.
     public static final int ARG_DEFAULT_MAP_TYPE = 0;
