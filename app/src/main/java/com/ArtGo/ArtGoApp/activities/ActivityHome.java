@@ -26,6 +26,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.ArtGo.ArtGoApp.utils.MyItem;
+import com.ArtGo.ArtGoApp.utils.OwnIconRendered;
 import com.ArtGo.ArtGoApp.utils.RestClient;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.mrengineer13.snackbar.SnackBar;
@@ -54,6 +56,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.MarkerManager;
+import com.google.maps.android.clustering.ClusterManager;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.ArtGo.ArtGoApp.R;
@@ -85,7 +89,7 @@ public class ActivityHome extends AppCompatActivity
         LocationListener,
         ResultCallback<LocationSettingsResult>,
         View.OnClickListener,
-        GoogleMap.OnInfoWindowClickListener,
+        //GoogleMap.OnInfoWindowClickListener,
         OnMapReadyCallback, SnackBar.OnMessageClickListener {
 
     private static final String TAG = ActivityHome.class.getSimpleName();
@@ -135,6 +139,10 @@ public class ActivityHome extends AppCompatActivity
     // Represents a geographical location
     protected Location mCurrentLocation;
 
+    // ClusterManager
+    private ClusterManager<MyItem> mClusterManager;
+
+
     // Create arraylist variables to store data
     private ArrayList<String> mLocationIds          = new ArrayList<>();
     private ArrayList<String> mLocationNames        = new ArrayList<>();
@@ -174,7 +182,7 @@ public class ActivityHome extends AppCompatActivity
         setContentView(R.layout.activity_home);
 
         // Connect view objects with view ids in xml
-        CircleProgressBar 
+        CircleProgressBar
              mPrgLoading = (CircleProgressBar) findViewById(R.id.prgLoading);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mList            = (RecyclerView) findViewById(R.id.list);
@@ -338,14 +346,14 @@ public class ActivityHome extends AppCompatActivity
     }
 
     // Method to handle click on info window
-    @Override
-    public void onInfoWindowClick(Marker marker) {
+    //@Override
+    /*public void onInfoWindowClick(Marker marker) {
         // Open ActivityDetail and pass location id
         String selectedLocationId = mLocationIdsOnMarkers.get(marker.getId());
         Intent detailIntent = new Intent(this, ActivityDetail.class);
         detailIntent.putExtra(Utils.ARG_LOCATION_ID, selectedLocationId);
         startActivity(detailIntent);
-    }
+    }*/
 
     // Method to set up map
     @Override
@@ -356,9 +364,9 @@ public class ActivityHome extends AppCompatActivity
                 .progressIndeterminateStyle(false)
                 .cancelable(false)
                 .show();
-        
+
         mMap = googleMap;
-        mMap.setOnInfoWindowClickListener(this);
+        //mMap.setOnInfoWindowClickListener(this);
         setMapType(mSelectedMapType);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -1122,24 +1130,59 @@ public class ActivityHome extends AppCompatActivity
     private void setupMarker(){
         // Clear map before displaying marker
         mMap.clear();
+        mClusterManager = new ClusterManager<MyItem>(this, mMap);
+        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
+        mMap.setOnInfoWindowClickListener(mClusterManager);
 
         // Add marker to all locations
-        for(int i = 0; i< mLocationLatitudes.size(); i++){
+        for(int i = 0; i< mLocationLatitudes.size(); i++) {
 
             int marker = getResources().getIdentifier(
                     mLocationMarkers.get(i), "mipmap", getPackageName());
 
-            Marker locationMarker = mMap.addMarker(new MarkerOptions()
+            /*Marker locationMarker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
                             Double.valueOf(mLocationLongitudes.get(i))))
                     .icon(BitmapDescriptorFactory.fromResource(marker))
                     .snippet(mLocationAddresses.get(i))
-                    .title(mLocationNames.get(i)));
+                    .title(mLocationNames.get(i)));*/
+            String id = Integer.toString(i);
+            MyItem item = new MyItem(id,new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
+                    Double.valueOf(mLocationLongitudes.get(i))),
+                    mLocationNames.get(i),
+                    mLocationAddresses.get(i),
+                    BitmapDescriptorFactory.fromResource(marker));
+            mClusterManager.addItem(item);
+            mLocationIdsOnMarkers.put(item.getId(), mLocationIds.get(i));
 
-            mLocationIdsOnMarkers.put(locationMarker.getId(), mLocationIds.get(i));
+            mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> (){
+                @Override
+                public void onClusterItemInfoWindowClick(MyItem item) {
+                    String id = mLocationIdsOnMarkers.get(item.getId());
+                    loadDetail(id);
+                }
+            });
+
+           /* mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MyItem> (){
+                @Override
+                public boolean onClusterItemClick(MyItem item) {
+                    String id = mLocationIdsOnMarkers.get(item.getId());
+                    loadDetail(id);
+                    return false;
+                }
+            });*/
 
         }
+        mClusterManager.setRenderer(new OwnIconRendered(this, mMap, mClusterManager));
 
+    }
+
+    private void loadDetail(String id){
+        Intent detailIntent = new Intent(this, ActivityDetail.class);
+        detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
+        startActivity(detailIntent);
     }
 
     // Method to sort data by distance

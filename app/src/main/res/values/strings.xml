@@ -2,7 +2,7 @@
     <!-- App name -->
     <string name="app_name">ArtGo</string>
 
-    <!-- Item menu name -->
+    <!-- MyItem menu name -->
     <string name="action_about">About</string>
     <string name="action_view">View</string>
 
