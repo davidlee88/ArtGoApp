@@ -15,7 +15,7 @@ import com.ArtGo.ArtGoApp.R;
 import java.lang.ref.WeakReference;
 
 /**
- * Design and developed by pongodev.com
+ *
  *
  * ImageLoaderFromDrawable is created to handle efficiency of image file memory.
  */

@@ -102,6 +102,8 @@
         <item>Terrain</item>
     </array>
 
+    <!--Facebook application ID-->
+    <string name="facebook_app_id">325861297747191</string>
 
     <!-- ripple duration -->
     <integer name="ripple_duration">30</integer>

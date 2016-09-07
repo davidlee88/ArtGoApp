@@ -26,7 +26,7 @@
     <dimen name="item_twoline_height">96dp</dimen>
     <dimen name="divider_height">1dp</dimen>
     <dimen name="flexible_space_image_height">320dp</dimen>
-    <dimen name="parallax_image_height">180dp</dimen>
+    <dimen name="parallax_image_height">175dp</dimen>
     <dimen name="parallax_image_plus_toolbar_height">252dp</dimen>
     <dimen name="circleprogressbar_width">60dp</dimen>
     <dimen name="circleprogressbar_height">60dp</dimen>

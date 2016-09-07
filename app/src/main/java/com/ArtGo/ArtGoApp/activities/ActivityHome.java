@@ -371,7 +371,7 @@ public class ActivityHome extends AppCompatActivity
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        Log.d(Utils.TAG_PONGODEV + TAG, "onMapReady");
+        //Log.d(Utils.TAG_PONGODEV + TAG, "onMapReady");
     }
 
     @Override
@@ -582,8 +582,7 @@ public class ActivityHome extends AppCompatActivity
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         // If GPS enabled, start location update to get user position
-                        Log.d(Utils.TAG_PONGODEV + TAG,
-                                "User agreed to make required location settings changes.");
+                        //Log.d(Utils.TAG_PONGODEV + TAG,"User agreed to make required location settings changes.");
                         startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:
@@ -677,7 +676,7 @@ public class ActivityHome extends AppCompatActivity
                     mRequestingLocationUpdates = true;
                 }
             });
-            Log.d(Utils.TAG_PONGODEV + TAG, "startLocationUpdates");
+            //Log.d(Utils.TAG_PONGODEV + TAG, "startLocationUpdates");
         }
     }
 
@@ -828,6 +827,7 @@ public class ActivityHome extends AppCompatActivity
                 new LatLng(mCurrentLatitude, mCurrentLongitude),
                 Utils.ARG_DEFAULT_MAP_ZOOM_LEVEL);
         mMap.animateCamera(cameraUpdate);
+
 
     }
 

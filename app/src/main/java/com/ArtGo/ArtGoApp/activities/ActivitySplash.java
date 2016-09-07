@@ -9,6 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.ArtGo.ArtGoApp.R;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 /**
  *
@@ -27,7 +29,8 @@ public class ActivitySplash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_splash);
-
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         // Create loading to wait for few second before displaying ActivityHome
         new Loading().execute();
     }

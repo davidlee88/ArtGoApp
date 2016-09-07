@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.ArtGo.ArtGoApp"
-        minSdkVersion 10
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 7
         versionName "3.1"
@@ -21,11 +21,13 @@ android {
 
 repositories {
     maven { url "https://jitpack.io" }
+    mavenCentral()
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
     compile 'com.android.support:appcompat-v7:23.1.0'

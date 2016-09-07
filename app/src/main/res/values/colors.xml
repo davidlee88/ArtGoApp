@@ -5,11 +5,13 @@
     <color name="dark_primary_color">#1e4872</color>
     <color name="light_primary_color">#BBDEFB</color>
     <color name="text_and_icon_color">#FFFFFF</color>
-    <color name="accent_color">#595a57</color>
+    <color name="accent_color">#a02c2929</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     <color name="divider_color">#B6B6B6</color>
     <color name="window_background_color">#E6E8E9</color>
-    <color name="material_background_color">#60ffffff</color>
+    <color name="material_background_color">#81ffffff</color>
+    <color name="material_background_color_4">#ffffff</color>
     <color name="material_background_color_2">#f2f4f5</color>
+    <color name="material_background_color_3">#fff8f8</color>
 </resources>
