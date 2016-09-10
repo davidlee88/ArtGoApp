@@ -42,8 +42,8 @@
     <!-- Sharing content -->
     <string name="share_to">Share to</string>
     <string name="permission">Permission</string>
-    <string name="subject">Perfect app to not get lost in the city</string>
-    <string name="message"> is city app that will help you explore the city. Download it at </string>
+    <string name="subject">Perfect app to find nice art work in city</string>
+    <string name="message"> is city app that will help you explore the city art work. Download it at </string>
     <string name="open_with">Open with:</string>
     <string name="phone">Phone:</string>
     <string name="sent_via_message">This message was sent from</string>
@@ -77,7 +77,7 @@
     </array>
 
     <!-- Google Play url. Change your.package.name with your own package name. -->
-    <string name="google_play_url">https://play.google.com/store/apps/details?id=your.package.name</string>
+    <string name="google_play_url">https://play.google.com/store/apps/details?id=com.ArtGo.ArtGoApp</string>
 
     <!-- Banner ad id. Insert your own banner id, you can get banner id via admob. -->
     <string name="banner_ad_unit_id">BANNER_AD_UNIT_ID</string>
@@ -104,6 +104,8 @@
 
     <!--Facebook application ID-->
     <string name="facebook_app_id">325861297747191</string>
+    <!--Facebook ShareButton String-->
+    <string name="shareFB">Share</string>
 
     <!-- ripple duration -->
     <integer name="ripple_duration">30</integer>

@@ -10,8 +10,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,13 +26,26 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ArtGo.ArtGoApp.utils.RestClient;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.toolbox.ImageLoader;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
@@ -55,7 +71,6 @@ import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
 import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
 import com.ArtGo.ArtGoApp.utils.MySingleton;
 import com.ArtGo.ArtGoApp.utils.Utils;
-
 import org.json.JSONObject;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
@@ -79,9 +94,6 @@ public class ActivityDetail extends ActivityBase implements
 
     // Create view objects
     private ImageView mImgLocationImage;
-    //private View mImgLocationImage;
-    //private View mThumbView;
-    //private ImageView fullScreenContainer;
     private Toolbar mToolbarView;
     private ObservableScrollView mScrollView;
     private int mParallaxImageHeight;
@@ -98,7 +110,9 @@ public class ActivityDetail extends ActivityBase implements
     private DBHelperLocations mDBhelper;
     private boolean mIsAdmobVisible;
     private String mSelectedId;
-
+    private ImageButton mSharebutton;
+    private CallbackManager callbackManager;
+    private ShareDialog shareDialog;
     private static final int REQUEST_CALL_PHONE = 0;
 
     // Create variables to store location data
@@ -130,8 +144,6 @@ public class ActivityDetail extends ActivityBase implements
 
         // Connect view objects and view ids in xml
         mImgLocationImage         = (ImageView) findViewById(R.id.image);
-        //mImgLocationImage         =  findViewById(R.id.image);
-        //mThumbView                = findViewById(R.id.image);
         mPrgLoading               = (CircleProgressBar) findViewById(R.id.prgLoading);
         mToolbarView              = (Toolbar) findViewById(R.id.toolbar);
         mTxtDescription           = (HtmlTextView) findViewById(R.id.txtDescription);
@@ -146,7 +158,7 @@ public class ActivityDetail extends ActivityBase implements
         mScrollView               = (ObservableScrollView) findViewById(R.id.scroll);
         SupportMapFragment mMapFragment = ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map));
-
+        FacebookSdk.sdkInitialize(this);
         // Call onMapReady to set up map
         mMapFragment.getMapAsync(this);
 
@@ -170,7 +182,10 @@ public class ActivityDetail extends ActivityBase implements
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         // Get admob visibility value
         //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
-
+        mSharebutton =  (ImageButton) findViewById(R.id.btnShare);
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
+        mSharebutton.setOnClickListener(this);
         // Load ad in background using asynctask class
         //new SyncShowAd(mAdView).execute();
 
@@ -179,7 +194,6 @@ public class ActivityDetail extends ActivityBase implements
 
         // Get location data from database in background using asyntask class
         new SyncGetLocations().execute();
-
         //
     }
 
@@ -521,6 +535,7 @@ public class ActivityDetail extends ActivityBase implements
                     startActivity(browserIntent);
                 }
                 break;
+
             case R.id.btnShare:
                 // Share location info to other apps
                 String message = mLocationAddress+"\n"+getString(R.string.phone)+" "+mLocationPhone+
@@ -574,6 +589,9 @@ public class ActivityDetail extends ActivityBase implements
                     zoomImageFromThumbLocal(mImgLocationImage, image);
                 }
                 //mScrollView.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.btnShare:
+                sharePhotoToFB();
                 break;
         }
     }
@@ -929,6 +947,41 @@ public class ActivityDetail extends ActivityBase implements
         }
     }
 
+    //Facebook share
+    private void sharePhotoToFB() {
+        if (ShareDialog.canShow(SharePhotoContent.class)) {
+
+
+            if(mLocationImage.toLowerCase().contains("http")){
+                Bitmap bitmap = mImageLoader.get(mLocationImage,
+                        com.android.volley.toolbox.ImageLoader.getImageListener(mImgLocationImage,
+                                R.mipmap.empty_photo, R.mipmap.empty_photo)).getBitmap();
+
+                SharePhoto photo = new SharePhoto.Builder()
+                        .setBitmap(bitmap)
+                        .setCaption("Nice ArtWork To Share!")
+                        .build();
+                SharePhotoContent content = new SharePhotoContent.Builder()
+                        .addPhoto(photo)
+                        .build();
+                shareDialog.show(content);
+            } else {
+                int imageRe = getResources().getIdentifier(mLocationImage, "drawable",
+                        getPackageName());
+                Bitmap image = BitmapFactory.decodeResource(getResources(),imageRe);
+                SharePhoto photo = new SharePhoto.Builder()
+                        .setBitmap(image)
+                        .setCaption("Nice ArtWork To Share!")
+                        .build();
+                SharePhotoContent content = new SharePhotoContent.Builder()
+                        .addPhoto(photo)
+                        .build();
+                shareDialog.show(content);
+            }
+        }
+
+    }
+
     // Method to display share dialog
     private void askPermissionDialog(){
         MaterialDialog dialog = new MaterialDialog.Builder(this)
@@ -1029,4 +1082,10 @@ public class ActivityDetail extends ActivityBase implements
         super.onDestroy();
     }
 
+    //FaceBook Call back
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 }
