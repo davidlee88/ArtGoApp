@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import com.ArtGo.ArtGoApp.R;
 
 /**
- * Design and developed by pongodev.com
  *
  * ActivityBase is created to handle scrolling page event.
  * Modified from ObservableScrollView library.

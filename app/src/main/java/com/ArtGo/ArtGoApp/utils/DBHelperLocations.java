@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 /**
  *
- *
  * DBHelperLocations is created to handle location database operation that used within application.
  * Created using SQLiteOpenHelper.
  */

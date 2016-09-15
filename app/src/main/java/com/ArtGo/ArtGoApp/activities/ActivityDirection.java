@@ -43,8 +43,6 @@ import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 import org.w3c.dom.Document;
 
 /**
- * Design and developed by pongodev.com
- *
  * ActivityDirection is created to display direction to location from user position.
  * Created using AppCompatActivity.
  */

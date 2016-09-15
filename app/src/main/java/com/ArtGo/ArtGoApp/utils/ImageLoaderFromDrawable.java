@@ -16,7 +16,6 @@ import java.lang.ref.WeakReference;
 
 /**
  *
- *
  * ImageLoaderFromDrawable is created to handle efficiency of image file memory.
  */
 public class ImageLoaderFromDrawable {

@@ -14,7 +14,6 @@ import com.facebook.appevents.AppEventsLogger;
 
 /**
  *
- *
  * ActivitySplash is created to display welcome screen.
  * Created using AppCompatActivity.
  */

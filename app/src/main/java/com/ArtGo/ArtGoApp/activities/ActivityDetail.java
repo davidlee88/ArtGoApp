@@ -81,8 +81,6 @@ import java.util.ArrayList;
 import static android.Manifest.permission.CALL_PHONE;
 
 /**
- *
- *
  * ActivityDetail is created to display location detail.
  * Created using ActivityBase.
  */

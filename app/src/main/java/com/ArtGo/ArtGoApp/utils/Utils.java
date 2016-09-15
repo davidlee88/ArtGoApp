@@ -8,7 +8,6 @@ import com.google.android.gms.ads.AdView;
 
 /**
  *
- *
  * Utils is created to set application configuration, from database path, ad visibility.
  */
 public class Utils {
