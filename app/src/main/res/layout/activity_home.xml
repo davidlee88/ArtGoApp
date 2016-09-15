@@ -84,7 +84,7 @@
         android:layout_marginBottom="@dimen/standard_margin"
         android:layout_marginRight="@dimen/standard_margin"
         app:fab_icon="@mipmap/ic_my_location_white_36dp"
-        app:fab_colorNormal="@color/accent_color"
+        app:fab_colorNormal="@color/material_background_color_5"
         app:fab_colorPressed="@color/light_primary_color"/>
 
 </RelativeLayout>

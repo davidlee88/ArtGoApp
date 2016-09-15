@@ -1,4 +1,5 @@
-package com.ArtGo.ArtGoApp.utils; /**
+package com.ArtGo.ArtGoApp.utils;
+/**
  * Created by MoaoranLi on 2016/4/19.
  */
 

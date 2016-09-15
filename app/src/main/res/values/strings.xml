@@ -29,7 +29,7 @@
     <string name="pref_app_title">Application Name</string>
     <string name="pref_app_summary">ArtGo</string>
     <string name="pref_version_title">Build Version</string>
-    <string name="pref_version_summary">Version 1.0</string>
+    <string name="pref_version_summary">Version 3.2</string>
     <string name="pref_developer_title">Developer</string>
     <string name="pref_developer_summary">Moaoran Li</string>
     <string name="pref_copyright_title">Copyright</string>

@@ -139,13 +139,14 @@
                                     android:layout_width="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1">
-                                <ImageButton
+                                <ImageView
                                     android:id="@+id/btnShare"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
                                     android:text="@string/share"
-                                    android:src="@drawable/fb_logo"/>
+                                    android:src="@drawable/fb_logo"
+                                    style="?android:borderlessButtonStyle"/>
                                     </LinearLayout>
                             </LinearLayout>
                             <!--   <LinearLayout

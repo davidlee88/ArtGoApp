@@ -368,6 +368,10 @@ public class ActivityHome extends AppCompatActivity
         mMap = googleMap;
         //mMap.setOnInfoWindowClickListener(this);
         setMapType(mSelectedMapType);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                new LatLng(-27.4593199, 126.9375794),
+                4);
+        mMap.moveCamera(cameraUpdate);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);

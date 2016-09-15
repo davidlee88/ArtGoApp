@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -110,7 +111,7 @@ public class ActivityDetail extends ActivityBase implements
     private DBHelperLocations mDBhelper;
     private boolean mIsAdmobVisible;
     private String mSelectedId;
-    private ImageButton mSharebutton;
+    private ImageView mSharebutton;
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private static final int REQUEST_CALL_PHONE = 0;
@@ -182,7 +183,7 @@ public class ActivityDetail extends ActivityBase implements
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         // Get admob visibility value
         //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
-        mSharebutton =  (ImageButton) findViewById(R.id.btnShare);
+        mSharebutton =  (ImageView) findViewById(R.id.btnShare);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
         mSharebutton.setOnClickListener(this);
@@ -251,8 +252,13 @@ public class ActivityDetail extends ActivityBase implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                new LatLng(Utils.ARG_DEFAULT_LATITUDE, Utils.ARG_DEFAULT_LONGITUDE),
+                5);
+        mMap.moveCamera(cameraUpdate);
     }
 
     // Asynctask class to handle load data from database in background
@@ -591,6 +597,7 @@ public class ActivityDetail extends ActivityBase implements
                 //mScrollView.setVisibility(View.INVISIBLE);
                 break;
             case R.id.btnShare:
+                v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
                 sharePhotoToFB();
                 break;
         }
