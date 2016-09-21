@@ -586,7 +586,7 @@ public class ActivityHome extends AppCompatActivity
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         // If GPS enabled, start location update to get user position
-                        //Log.d(Utils.TAG_PONGODEV + TAG,"User agreed to make required location settings changes.");
+
                         startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:

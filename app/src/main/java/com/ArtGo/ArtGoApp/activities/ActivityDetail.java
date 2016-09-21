@@ -109,7 +109,6 @@ public class ActivityDetail extends ActivityBase implements
     private DBHelperLocations mDBhelper;
     private boolean mIsAdmobVisible;
     private String mSelectedId;
-    private ImageView mSharebutton;
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private static final int REQUEST_CALL_PHONE = 0;
@@ -153,6 +152,8 @@ public class ActivityDetail extends ActivityBase implements
         /*LinearLayout mBtnCall     = (LinearLayout) findViewById(R.id.btnCall);
         LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
         LinearLayout mBtnShare    = (LinearLayout) findViewById(R.id.btnShare);*/
+        LinearLayout mBtnShare1    = (LinearLayout) findViewById(R.id.btnShare1);
+        LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
         ButtonFlat mFlatDirection = (ButtonFlat) findViewById(R.id.flatDirection);
         mScrollView               = (ObservableScrollView) findViewById(R.id.scroll);
         SupportMapFragment mMapFragment = ((SupportMapFragment) getSupportFragmentManager()
@@ -169,9 +170,8 @@ public class ActivityDetail extends ActivityBase implements
 
         // Set listener for some view objects
         mScrollView.setScrollViewCallbacks(this);
-        /*mBtnCall.setOnClickListener(this);
         mBtnWebsite.setOnClickListener(this);
-        mBtnShare.setOnClickListener(this);*/
+        mBtnShare1.setOnClickListener(this);
         mFlatDirection.setOnClickListener(this);
         mImgLocationImage.setOnClickListener(this);
 
@@ -181,10 +181,9 @@ public class ActivityDetail extends ActivityBase implements
         mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         // Get admob visibility value
         //mIsAdmobVisible = Utils.admobVisibility(mAdView, Utils.IS_ADMOB_VISIBLE);
-        mSharebutton =  (ImageView) findViewById(R.id.btnShare);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
-        mSharebutton.setOnClickListener(this);
+        //mSharebutton.setOnClickListener(this);
         // Load ad in background using asynctask class
         //new SyncShowAd(mAdView).execute();
 
@@ -451,7 +450,7 @@ public class ActivityDetail extends ActivityBase implements
             mLocationLatitude = part1;
             mLocationLongitude = part2;
             mLocationPhone = "";
-            mLocationWebsite = "";
+            mLocationWebsite = row.get("website").toString();
             mLocationMarker = row.get("marker").toString();
             mLocationCategory = row.get("typename").toString();
             mLocationAuthor = row.get("author").toString();
@@ -525,32 +524,20 @@ public class ActivityDetail extends ActivityBase implements
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            /*case R.id.btnCall:
-                makeACall();
-                break;
             case R.id.btnWebsite:
                 // If website address is not available display snackbar,
                 // else open browser to access website
-                if(mLocationWebsite.equals("-")){
+                v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
+                if(mLocationWebsite.equals("null")){
                     showSnackBar(getString(R.string.no_website_available));
                 }else {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-                    browserIntent.setData(Uri.parse(mLocationWebsite));
+                    browserIntent.setData(Uri.parse(mLocationWebsite.trim()));
                     startActivity(browserIntent);
                 }
                 break;
-
-            case R.id.btnShare:
-                // Share location info to other apps
-                String message = mLocationAddress+"\n"+getString(R.string.phone)+" "+mLocationPhone+
-                        "\n"+mLocationWebsite+"\n\n"+getString(R.string.sent_via_message)+" "+
-                        getString(R.string.app_name)+". "+getString(R.string.download)+" "+getString(R.string.app_name)+
-                        " "+getString(R.string.at)+" "+getString(R.string.google_play_url);
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mLocationName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, message);
-                startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share_to)));
+            /*case R.id.btnCall:
+                makeACall();
                 break;*/
             case R.id.flatDirection:
                 new MaterialDialog.Builder(this)
@@ -594,7 +581,7 @@ public class ActivityDetail extends ActivityBase implements
                 }
                 //mScrollView.setVisibility(View.INVISIBLE);
                 break;
-            case R.id.btnShare:
+            case R.id.btnShare1:
                 v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
                 sharePhotoToFB();
                 break;

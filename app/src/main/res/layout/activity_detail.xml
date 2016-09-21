@@ -123,7 +123,7 @@
                                 android:background="@color/divider_color"
                                 android:layout_below="@+id/txtLocationCategory"/>
 
-                            <!-- Action buttons to call, website, and share -->
+                            <!-- Action buttons to website, and share -->
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -135,86 +135,49 @@
                                 android:background="@color/material_background_color_4"
                                 android:layout_below="@+id/divider">
                                 <LinearLayout
+                                    android:id="@+id/btnShare1"
                                     android:layout_height="wrap_content"
                                     android:layout_width="wrap_content"
                                     android:orientation="vertical"
                                     android:layout_weight="1">
-                                <ImageView
-                                    android:id="@+id/btnShare"
-                                    android:layout_width="wrap_content"
+                                    <com.mikepenz.iconics.view.IconicsImageView
+                                        android:layout_width="@dimen/thumb_width_small"
+                                        android:layout_height="@dimen/thumb_height_small"
+                                        android:layout_gravity="center_horizontal"
+                                        app:iiv_icon="gmd-share"
+                                        app:iiv_color="@color/primary_color"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/standard_margin"
+                                        android:layout_gravity="center_horizontal"
+                                        android:textColor="@color/primary_color"
+                                        android:layout_centerVertical="true"
+                                        android:text="@string/share" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:id="@+id/btnWebsite"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="center_horizontal"
-                                    android:text="@string/share"
-                                    android:src="@drawable/fb_logo"
-                                    style="?android:borderlessButtonStyle"/>
-                                    </LinearLayout>
+                                    android:layout_width="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1">
+                                    <com.mikepenz.iconics.view.IconicsImageView
+                                        android:layout_width="@dimen/thumb_width_small"
+                                        android:layout_height="@dimen/thumb_height_small"
+                                        android:layout_gravity="center_horizontal"
+                                        android:layout_centerVertical="true"
+                                        app:iiv_icon="gmd_public"
+                                        app:iiv_color="@color/primary_color"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/standard_margin"
+                                        android:layout_gravity="center_horizontal"
+                                        android:textColor="@color/primary_color"
+                                        android:layout_centerVertical="true"
+                                        android:text="@string/website" />
+                                </LinearLayout>
                             </LinearLayout>
-                            <!--   <LinearLayout
-                                   android:id="@+id/btnCall"
-                                   android:layout_height="wrap_content"
-                                   android:layout_width="wrap_content"
-                                   android:orientation="vertical"
-                                   android:layout_weight="1">
-                                   <com.mikepenz.iconics.view.IconicsImageView
-                                       android:layout_width="@dimen/thumb_width_small"
-                                       android:layout_height="@dimen/thumb_height_small"
-                                       android:layout_gravity="center_horizontal"
-                                       app:iiv_icon="gmd-call"
-                                       app:iiv_color="@color/primary_color"/>
-                                   <TextView
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:layout_marginTop="@dimen/standard_margin"
-                                       android:layout_gravity="center_horizontal"
-                                       android:textColor="@color/primary_color"
-                                       android:layout_centerVertical="true"
-                                       android:text="@string/call"/>
-                               </LinearLayout>
-
-                               <LinearLayout
-                                   android:id="@+id/btnWebsite"
-                                   android:layout_height="wrap_content"
-                                   android:layout_width="wrap_content"
-                                   android:orientation="vertical"
-                                   android:layout_weight="1">
-                                   <com.mikepenz.iconics.view.IconicsImageView
-                                       android:layout_width="@dimen/thumb_width_small"
-                                       android:layout_height="@dimen/thumb_height_small"
-                                       android:layout_gravity="center_horizontal"
-                                       android:layout_centerVertical="true"
-                                       app:iiv_icon="gmd_public"
-                                       app:iiv_color="@color/primary_color"/>
-                                   <TextView
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:layout_marginTop="@dimen/standard_margin"
-                                       android:layout_gravity="center_horizontal"
-                                       android:textColor="@color/primary_color"
-                                       android:layout_centerVertical="true"
-                                       android:text="@string/website" />
-                               </LinearLayout>
-
-                               <LinearLayout
-                                   android:id="@+id/btnShare"
-                                   android:layout_height="wrap_content"
-                                   android:layout_width="wrap_content"
-                                   android:orientation="vertical"
-                                   android:layout_weight="1">
-                                   <com.mikepenz.iconics.view.IconicsImageView
-                                       android:layout_width="@dimen/thumb_width_small"
-                                       android:layout_height="@dimen/thumb_height_small"
-                                       android:layout_gravity="center_horizontal"
-                                       app:iiv_icon="gmd-share"
-                                       app:iiv_color="@color/primary_color"/>
-                                   <TextView
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:layout_marginTop="@dimen/standard_margin"
-                                       android:layout_gravity="center_horizontal"
-                                       android:textColor="@color/primary_color"
-                                       android:layout_centerVertical="true"
-                                       android:text="@string/share" />
-                               </LinearLayout>-->
 
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
