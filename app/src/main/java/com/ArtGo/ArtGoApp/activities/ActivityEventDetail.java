@@ -14,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,30 +21,29 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ArtGo.ArtGoApp.R;
+import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
+import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
+import com.ArtGo.ArtGoApp.utils.MySingleton;
 import com.ArtGo.ArtGoApp.utils.RestClient;
+import com.ArtGo.ArtGoApp.utils.Utils;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.toolbox.ImageLoader;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.share.ShareApi;
-import com.facebook.share.Sharer;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareButton;
 import com.facebook.share.widget.ShareDialog;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
@@ -53,6 +51,8 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.github.mrengineer13.snackbar.SnackBar;
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -67,29 +67,28 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.nineoldandroids.view.ViewHelper;
-import com.ArtGo.ArtGoApp.R;
-import com.ArtGo.ArtGoApp.utils.DBHelperLocations;
-import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
-import com.ArtGo.ArtGoApp.utils.MySingleton;
-import com.ArtGo.ArtGoApp.utils.Utils;
+
 import org.json.JSONObject;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import static android.Manifest.permission.CALL_PHONE;
 
 /**
  * ActivityDetail is created to display location detail.
  * Created using ActivityBase.
  */
-public class ActivityDetail extends ActivityBase implements
+public class ActivityEventDetail extends ActivityBase implements
         ObservableScrollViewCallbacks,
         View.OnClickListener,
         OnMapReadyCallback {
 
-    private static final String TAG = ActivityDetail.class.getSimpleName();
+    private static final String TAG = ActivityEventDetail.class.getSimpleName();
 
     // Create view objects
     private ImageView mImgLocationImage;
@@ -112,19 +111,20 @@ public class ActivityDetail extends ActivityBase implements
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private static final int REQUEST_CALL_PHONE = 0;
-
+    private CompactCalendarView compactCalendarView;
+    private Toolbar toolbar;
     // Create variables to store location data
     private String mLocationName, mLocationAddress, mLocationImage,
             mLocationLongitude, mLocationLatitude, mLocationDescription, mLocationPhone,
-            mLocationWebsite, mLocationMarker, mLocationCategory,mLocationAuthor,mLocationDate,mLocationStructure;
-
+            mLocationWebsite, mLocationMarker, mLocationCategory,mLocationDate,mLocationEndDate;
+    private SimpleDateFormat dateFormatForMonth;
     // Create float array variable to store distance between location and user position
     private float[] mDistance = new float[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_event_detail);
 
         // Get dimension value from dimens.xml
         Resources mRes      = getResources();
@@ -148,6 +148,16 @@ public class ActivityDetail extends ActivityBase implements
         mTxtLocationName          = (TextView) findViewById(R.id.txtLocationName);
         mTxtLocationCategory      = (TextView) findViewById(R.id.txtLocationCategory);
         mTxtLocationDistance      = (TextView) findViewById(R.id.txtLocationDistance);
+        //Set calendar view
+        compactCalendarView = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
+        compactCalendarView.setLocale(TimeZone.getDefault(), Locale.ENGLISH);
+        compactCalendarView.setUseThreeLetterAbbreviation(true);
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.ENGLISH);
+        toolbar.setTitle(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+
         //mAdView                   = (AdView) findViewById(R.id.adView);
         /*LinearLayout mBtnCall     = (LinearLayout) findViewById(R.id.btnCall);
         LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
@@ -156,8 +166,7 @@ public class ActivityDetail extends ActivityBase implements
         LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
         ButtonFlat mFlatDirection = (ButtonFlat) findViewById(R.id.flatDirection);
         mScrollView               = (ObservableScrollView) findViewById(R.id.scroll);
-        SupportMapFragment mMapFragment = ((SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map));
+        SupportMapFragment mMapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
         FacebookSdk.sdkInitialize(this);
         // Call onMapReady to set up map
         mMapFragment.getMapAsync(this);
@@ -167,6 +176,7 @@ public class ActivityDetail extends ActivityBase implements
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().
                 getColor(R.color.primary_color)));
+
         // Set listener for some view objects
         mScrollView.setScrollViewCallbacks(this);
         mBtnWebsite.setOnClickListener(this);
@@ -183,6 +193,9 @@ public class ActivityDetail extends ActivityBase implements
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
         //mSharebutton.setOnClickListener(this);
+
+
+
         // Load ad in background using asynctask class
         //new SyncShowAd(mAdView).execute();
 
@@ -287,18 +300,57 @@ public class ActivityDetail extends ActivityBase implements
             super.onPostExecute(aVoid);
 
             // When finished retrieve data from database, display data to the views
-            mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + "</strong>  " +
-                    "<em>" + mLocationAddress + "</em><br /><strong>"+getString(R.string.author)+"</strong>  <em>"+mLocationAuthor+"</em><br />" +
-                    "<strong>"+getString(R.string.date)+"</strong>  <em>"+mLocationDate+"</em><br /><strong>"+getString(R.string.structure)+"</strong>  <em>"+mLocationStructure+"</em><br /><br />" + mLocationDescription, true);
+            mTxtDescription.setHtmlFromString("<strong>Start Date</strong>  " +
+                    "<em>" + mLocationDate + "</em><br /><strong>End Date</strong>  <em>"+mLocationEndDate+"</em><br />" +
+                    "<br /><br />" + mLocationDescription, true);
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
             String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +
                     getString(R.string.km);
             mTxtLocationDistance.setText(mFinalDistance);
+            //set up calendar view
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
+            try {
+                Date startDate = format.parse(mLocationDate);
+                Date endDate = format.parse(mLocationEndDate);
+                Event ev1 = new Event(Color.GREEN, startDate.getTime(), "Event Start");
+                Event ev2 = new Event(Color.YELLOW, endDate.getTime(), "Event End");
+
+                //compactCalendarView.addEvent(ev1);
+                compactCalendarView.addEvent(ev1);
+                compactCalendarView.addEvent(ev2);
+                compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+                    @Override
+                    public void onDayClick(Date dateClicked) {
+
+                        List<Event> events = compactCalendarView.getEvents(dateClicked);
+                        if(events.size() == 2){
+                                Toast.makeText(getApplicationContext(), events.get(0).getData().toString(),
+                                Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), events.get(1).getData().toString(),
+                                Toast.LENGTH_SHORT).show();
+                        }else{
+                            if(events.size() == 1) {
+                                        Toast.makeText(getApplicationContext(), events.get(0).getData().toString(),
+                                        Toast.LENGTH_SHORT).show();
+                            }else
+                                Log.d(TAG, "Day was clicked: " + dateClicked + " with events " + events);
+                        }
+                    }
+
+                    @Override
+                    public void onMonthScroll(Date firstDayOfNewMonth) {
+                        toolbar.setTitle(dateFormatForMonth.format(firstDayOfNewMonth));
+                        Log.d(TAG, "Month was scrolled to: " + firstDayOfNewMonth);
+                    }
+                });
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
 
             if(mLocationImage.toLowerCase().contains("http")){
                 mImageLoader.get(mLocationImage,
-                        com.android.volley.toolbox.ImageLoader.getImageListener(mImgLocationImage,
+                        ImageLoader.getImageListener(mImgLocationImage,
                                 R.mipmap.empty_photo, R.mipmap.empty_photo));
 
             } else {
@@ -313,7 +365,7 @@ public class ActivityDetail extends ActivityBase implements
                     .position(new LatLng(Double.valueOf(mLocationLatitude),
                             Double.valueOf(mLocationLongitude)))
                     .icon(BitmapDescriptorFactory.fromResource(marker))
-                    .snippet(mLocationAddress)
+                    .snippet("New Event")
                     .title(mLocationName));
 
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
@@ -360,8 +412,8 @@ public class ActivityDetail extends ActivityBase implements
                 }
 
                 // When interstitialTrigger equals ARG_TRIGGER_VALUE, display interstitial ad
-                interstitialAd = new InterstitialAd(ActivityDetail.this);
-                interstitialAd.setAdUnitId(ActivityDetail.this.getResources().getString(R.string.interstitial_ad_unit_id));
+                interstitialAd = new InterstitialAd(ActivityEventDetail.this);
+                interstitialAd.setAdUnitId(ActivityEventDetail.this.getResources().getString(R.string.interstitial_ad_unit_id));
                 interstitialTrigger = Utils.loadPreferences(getApplicationContext(),
                         Utils.ARG_TRIGGER);
                 if(interstitialTrigger == Utils.ARG_TRIGGER_VALUE) {
@@ -413,29 +465,7 @@ public class ActivityDetail extends ActivityBase implements
         }
     }
 
-    // Method to retrieve data from database
-    /*public void getLocationDataFromDatabase(String id) {
-        ArrayList<Object> row = mDBhelper.getLocationDetailById(id);
-
-        mLocationName           = row.get(0).toString();
-        mLocationAddress        = row.get(1).toString();
-        mLocationDescription    = row.get(2).toString();
-        mLocationImage          = row.get(3).toString();
-        mLocationLatitude       = row.get(4).toString();
-        mLocationLongitude      = row.get(5).toString();
-        mLocationDescription    = row.get(6).toString();
-        mLocationPhone          = row.get(7).toString();
-        mLocationWebsite        = row.get(8).toString();
-        mLocationMarker         = row.get(9).toString();
-        mLocationCategory       = row.get(10).toString();
-
-        // Get distance between user position and location
-        Location.distanceBetween(Double.valueOf(row.get(4).toString()),
-                Double.valueOf(row.get(5).toString()),
-                ActivityHome.mCurrentLatitude, ActivityHome.mCurrentLongitude, mDistance);
-
-    }*/
-
+    //get location details data from rest client
     public void getLocationDataFromRest(String id) {
         JSONObject row = RestClient.getLocationDetailById(id);
         try {
@@ -452,11 +482,12 @@ public class ActivityDetail extends ActivityBase implements
             mLocationWebsite = row.get("website").toString();
             mLocationMarker = row.get("marker").toString();
             mLocationCategory = row.get("typename").toString();
-            mLocationAuthor = row.get("author").toString();
-            String[] dates = row.get("date").toString().split("-");
-            String year = dates[0];
-            mLocationDate = year;
-            mLocationStructure = row.get("structure").toString();
+            String[] dates = row.get("date").toString().split("T");
+            String startDate = dates[0];
+            String[] endDates = row.get("endDate").toString().split("T");
+            mLocationDate = startDate;
+            String endDate = endDates[0];
+            mLocationEndDate = endDate;
 
             // Get distance between user position and location
             Location.distanceBetween(Double.valueOf(mLocationLatitude),
@@ -511,7 +542,6 @@ public class ActivityDetail extends ActivityBase implements
         {
             ApplicationInfo info = getPackageManager().getApplicationInfo(
                     "com.google.android.apps.maps", 0 );
-            Log.d(Utils.TAG_PONGODEV + TAG,"info= "+info);
             return true;
         }
         catch(PackageManager.NameNotFoundException e)
@@ -553,7 +583,7 @@ public class ActivityDetail extends ActivityBase implements
                                 break;
                             case 1:
                                 // Or use ArtGo to get direction from user position to the location
-                                Intent directionIntent = new Intent(ActivityDetail.this, ActivityDirection.class);
+                                Intent directionIntent = new Intent(ActivityEventDetail.this, ActivityDirection.class);
                                 directionIntent.putExtra(Utils.ARG_LOCATION_NAME, mLocationName);
                                 directionIntent.putExtra(Utils.ARG_LOCATION_ADDRESSES, mLocationAddress);
                                 directionIntent.putExtra(Utils.ARG_LOCATION_LATITUDE, mLocationLatitude);
@@ -569,7 +599,7 @@ public class ActivityDetail extends ActivityBase implements
             case R.id.image:
                 if(mLocationImage.toLowerCase().contains("http")){
                     Bitmap bitmap = mImageLoader.get(mLocationImage,
-                            com.android.volley.toolbox.ImageLoader.getImageListener(mImgLocationImage,
+                            ImageLoader.getImageListener(mImgLocationImage,
                                     R.mipmap.empty_photo, R.mipmap.empty_photo)).getBitmap();
                     zoomImageFromThumbInternet(mImgLocationImage,bitmap);
 
@@ -945,7 +975,7 @@ public class ActivityDetail extends ActivityBase implements
 
             if(mLocationImage.toLowerCase().contains("http")){
                 Bitmap bitmap = mImageLoader.get(mLocationImage,
-                        com.android.volley.toolbox.ImageLoader.getImageListener(mImgLocationImage,
+                        ImageLoader.getImageListener(mImgLocationImage,
                                 R.mipmap.empty_photo, R.mipmap.empty_photo)).getBitmap();
 
                 SharePhoto photo = new SharePhoto.Builder()
@@ -1005,6 +1035,10 @@ public class ActivityDetail extends ActivityBase implements
 
     }
 
+    private void syncToolbarDate(){
+                ActionBar toolbar = getSupportActionBar();
+                toolbar.setTitle(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+   }
     // Method to display setting dialog
     private void permissionSettingDialog(){
         MaterialDialog dialog = new MaterialDialog.Builder(this)

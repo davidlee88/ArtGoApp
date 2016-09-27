@@ -69,6 +69,18 @@
                 android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
         </activity>
         <activity
+            android:name="com.ArtGo.ArtGoApp.activities.ActivityEventDetail"
+            android:label=""
+            android:launchMode="singleTop"
+            android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityHome"
+            android:screenOrientation="portrait">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
+        </activity>
+        <activity
             android:name="com.ArtGo.ArtGoApp.activities.ActivityAbout"
             android:label="@string/about"
             android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityHome"

@@ -32,7 +32,7 @@ public class Utils {
     public static final String ARG_DATABASE_PATH = "/data/data/com.ArtGo.ArtGoApp/databases/";
 
     // Set default max distance between current user position and default user position
-    public static final float ARG_MAX_DISTANCE = (float) 100.0; // In kilometers
+    public static final float ARG_MAX_DISTANCE = (float) 1000.0; // In kilometers
     // Set default map zoom level. Set value from 1 to 17
     public static final int ARG_DEFAULT_MAP_ZOOM_LEVEL = 11;
 

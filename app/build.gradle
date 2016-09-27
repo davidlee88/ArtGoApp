@@ -8,8 +8,8 @@ android {
         applicationId "com.ArtGo.ArtGoApp"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 10
-        versionName "3.4"
+        versionCode 11
+        versionName "3.5"
     }
     buildTypes {
         release {
@@ -27,6 +27,7 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile 'com.github.sundeepk:compact-calendar-view:1.9.1'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.afollestad.material-dialogs:commons:0.9.0.1'

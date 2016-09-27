@@ -61,7 +61,8 @@
                     android:textColor="@color/secondary_text"
                     android:layout_below="@+id/txtRecipeName"
                     android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
             <!-- Location distance -->

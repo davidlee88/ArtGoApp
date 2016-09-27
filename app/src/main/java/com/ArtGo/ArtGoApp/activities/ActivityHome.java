@@ -154,12 +154,13 @@ public class ActivityHome extends AppCompatActivity
     private ArrayList<String> mLocationMarkers      = new ArrayList<>();
     private ArrayList<String> mCategoryIds          = new ArrayList<>();
     private ArrayList<String> mCategoryNames        = new ArrayList<>();
-
+    private ArrayList<String> mTypeId        = new ArrayList<>();
     // To handle LocationDistance in String
     private ArrayList<String> mLocationDistancesString    = new ArrayList<>();
 
     // Create hashmap variable to store marker id and location id
     private HashMap<String, String> mLocationIdsOnMarkers = new HashMap<>();
+    private HashMap<String, String> mLocationTypeOnMarkers = new HashMap<>();
 
     // Create string variable to store category id
     private String mSelectedCategoryId = "0";
@@ -265,10 +266,18 @@ public class ActivityHome extends AppCompatActivity
             @Override
             public void onTapView(int position) {
             // Open ActivityDetail when item in recyclerview clicked
-            Intent detailIntent = new Intent(getApplicationContext(), ActivityDetail.class);
-            detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
-            startActivity(detailIntent);
-            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+
+                String type = mLocationTypeOnMarkers.get(Integer.toString(position));
+                if(!type.equals("6")) {
+                    Intent detailIntent = new Intent(getApplicationContext(), ActivityDetail.class);
+                    detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
+                    startActivity(detailIntent);
+                }else{
+                    Intent detailIntent = new Intent(getApplicationContext(), ActivityEventDetail.class);
+                    detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
+                    startActivity(detailIntent);
+                }
+                overridePendingTransition(R.anim.open_next, R.anim.close_main);
             }
         });
 
@@ -428,7 +437,6 @@ public class ActivityHome extends AppCompatActivity
     //Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
     protected synchronized void buildGoogleApiClient() {
         if (mGoogleApiClient == null && checkGooglePlayService()) {
-            Log.d(Utils.TAG_PONGODEV + TAG, "Building GoogleApiClient");
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
@@ -512,7 +520,6 @@ public class ActivityHome extends AppCompatActivity
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
             // In debug mode, log the status
-            Log.d(Utils.TAG_PONGODEV + TAG, getString(R.string.play_services_available));
             return true;
 
             // Google Play services was not available for some reason
@@ -544,9 +551,7 @@ public class ActivityHome extends AppCompatActivity
         final Status status = locationSettingsResult.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
-                Log.d(Utils.TAG_PONGODEV + TAG, "All location settings are satisfied.");
                 if (mCurrentLocation == null) {
-                    Log.d(Utils.TAG_PONGODEV + TAG, "onResult SUCCESS mCurrentLocation == null");
                     mCurrentLocation = LocationServices.FusedLocationApi
                             .getLastLocation(mGoogleApiClient);
 
@@ -554,9 +559,6 @@ public class ActivityHome extends AppCompatActivity
                 startLocationUpdates();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.d(Utils.TAG_PONGODEV + TAG,
-                        "Location settings are not satisfied. Show the user a dialog to" +
-                                "upgrade location settings ");
 
                 try {
                     // Show the dialog by calling startResolutionForResult(), and check the result
@@ -617,7 +619,6 @@ public class ActivityHome extends AppCompatActivity
      */
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(Utils.TAG_PONGODEV + TAG, "onConnectionFailed");
         /*
          * Google Play services can resolve some errors it detects.
          * If the error has a resolution, try sending an Intent to
@@ -641,7 +642,6 @@ public class ActivityHome extends AppCompatActivity
 
                 // Log the error
                 e.printStackTrace();
-                Log.i("onConnectionFailed", ""+e);
             }
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(0, this, 0);
@@ -680,7 +680,6 @@ public class ActivityHome extends AppCompatActivity
                     mRequestingLocationUpdates = true;
                 }
             });
-            //Log.d(Utils.TAG_PONGODEV + TAG, "startLocationUpdates");
         }
     }
 
@@ -717,7 +716,6 @@ public class ActivityHome extends AppCompatActivity
                 // permission was granted, yay! Do the
                 // location-related task you need to do.
                 startLocationUpdates();
-                Log.d(Utils.TAG_PONGODEV + TAG, "Request Location Allowed");
             } else {
                 // permission was not granted
                 if (getApplicationContext() == null) {
@@ -967,7 +965,7 @@ public class ActivityHome extends AppCompatActivity
     public void getCategoryFromRestServer(){
         JSONArray locationType = RestClient.getAllCategoriesData();
 
-        // Ad "All Places" in first row
+        // Add "All Places" in first row
         mCategoryIds.add("0");
         mCategoryNames.add(getString(R.string.all_places));
         for(int i = 0; i< locationType.length(); i++){
@@ -976,7 +974,7 @@ public class ActivityHome extends AppCompatActivity
                 mCategoryIds.add(row.get("id").toString());
                 mCategoryNames.add(row.get("name").toString());
         }catch (Exception e){
-
+                e.printStackTrace();
             }
         }
     }
@@ -1090,6 +1088,7 @@ public class ActivityHome extends AppCompatActivity
         mLocationDistances.clear();
         mLocationMarkers.clear();
         mLocationDistancesString.clear();
+        mTypeId.clear();
 
         // Store data to arraylist variables
        JSONArray locations = RestClient.getLocationsByCategory(mSelectedCategoryId);
@@ -1118,9 +1117,9 @@ public class ActivityHome extends AppCompatActivity
 
                 // For trigger variable mLocationDistancesString
                 mLocationDistancesString.add(String.format("%.2f", paramDistance));
-
+                mTypeId.add(row.get("type").toString());
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
             // Sort data base on distance between location and user position
@@ -1145,7 +1144,7 @@ public class ActivityHome extends AppCompatActivity
 
             int marker = getResources().getIdentifier(
                     mLocationMarkers.get(i), "mipmap", getPackageName());
-
+            MyItem item;
             /*Marker locationMarker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
                             Double.valueOf(mLocationLongitudes.get(i))))
@@ -1156,20 +1155,35 @@ public class ActivityHome extends AppCompatActivity
             //set up markers and pass marker value to ClusterManager object
             String id = Integer.toString(i);
             //Create a MyItem object to store Marker info
-            MyItem item = new MyItem(id,new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
-                    Double.valueOf(mLocationLongitudes.get(i))),
-                    mLocationNames.get(i),
-                    mLocationAddresses.get(i),
-                    BitmapDescriptorFactory.fromResource(marker));
+
+            if(!mTypeId.get(i).equals("6")){
+                item = new MyItem(id, new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
+                        Double.valueOf(mLocationLongitudes.get(i))),
+                        mLocationNames.get(i),
+                        mLocationAddresses.get(i),
+                        BitmapDescriptorFactory.fromResource(marker));
+            }else {
+                item = new MyItem(id, new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
+                        Double.valueOf(mLocationLongitudes.get(i))),
+                        mLocationNames.get(i),
+                        "Incoming Art Event",
+                        BitmapDescriptorFactory.fromResource(marker));
+            }
             //Add Items to ClusterManager object
             mClusterManager.addItem(item);
             mLocationIdsOnMarkers.put(item.getId(), mLocationIds.get(i));
+            mLocationTypeOnMarkers.put(item.getId(), mTypeId.get(i));
             //Info window click listener
             mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> (){
                 @Override
                 public void onClusterItemInfoWindowClick(MyItem item) {
-                    String id = mLocationIdsOnMarkers.get(item.getId());
-                    loadDetail(id);
+                        String id = mLocationIdsOnMarkers.get(item.getId());
+                        String type = mLocationTypeOnMarkers.get(item.getId());
+                    if(!type.equals("6")) {
+                        loadDetail(id);
+                    } else {
+                        loadEventDetail(id);
+                    }
                 }
             });
 
@@ -1195,12 +1209,18 @@ public class ActivityHome extends AppCompatActivity
         startActivity(detailIntent);
     }
 
+    private void loadEventDetail(String id){
+        Intent detailIntent = new Intent(this, ActivityEventDetail.class);
+        detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
+        startActivity(detailIntent);
+    }
+
     // Method to sort data by distance
     private void sortDataByDistance()    {
         int j;
         boolean flag = true;   // set flag to true to begin first pass
         Float tempDistance;   //holding variable
-        String tempId, tempName, tempLatitude, tempLongitude, tempAddress, tempImage, tempMarker;
+        String tempId, tempName, tempLatitude, tempLongitude, tempAddress, tempImage, tempMarker,tempType;
         while ( flag )
         {
             flag= false;    //set flag to false awaiting a possible swap
@@ -1218,6 +1238,7 @@ public class ActivityHome extends AppCompatActivity
                     tempAddress     = mLocationAddresses.get(j);
                     tempImage       = mLocationImages.get(j);
                     tempMarker      = mLocationMarkers.get(j);
+                    tempType        = mTypeId.get(j);
 
                     mLocationDistances.set(j, mLocationDistances.get(j + 1));
 
@@ -1232,6 +1253,7 @@ public class ActivityHome extends AppCompatActivity
                     mLocationAddresses.set(j,mLocationAddresses.get(j+1) );
                     mLocationImages.set(j,mLocationImages.get(j+1) );
                     mLocationMarkers.set(j,mLocationMarkers.get(j+1) );
+                    mTypeId.set(j,mTypeId.get(j+1));
 
                     mLocationDistances.set(j + 1, tempDistance);
                     mLocationDistancesString.set(j + 1, String.format("%.2f", tempDistance));
@@ -1243,6 +1265,7 @@ public class ActivityHome extends AppCompatActivity
                     mLocationAddresses.set(j+1,tempAddress);
                     mLocationImages.set(j+1,tempImage);
                     mLocationMarkers.set(j+1,tempMarker);
+                    mTypeId.set(j+1,tempType);
 
                     flag = true;              //shows a swap occurred
                 } else {
