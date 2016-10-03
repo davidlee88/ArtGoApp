@@ -302,7 +302,7 @@ public class ActivityEventDetail extends ActivityBase implements
             // When finished retrieve data from database, display data to the views
             mTxtDescription.setHtmlFromString("<strong>Start Date</strong>  " +
                     "<em>" + mLocationDate + "</em><br /><strong>End Date</strong>  <em>"+mLocationEndDate+"</em><br />" +
-                    "<br /><br />" + mLocationDescription, true);
+                    "<br />" + mLocationDescription, true);
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
             String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +

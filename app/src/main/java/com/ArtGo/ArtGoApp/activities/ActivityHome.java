@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.ArtGo.ArtGoApp.adapters.CustomAdapter;
 import com.ArtGo.ArtGoApp.utils.MyItem;
 import com.ArtGo.ArtGoApp.utils.OwnIconRendered;
 import com.ArtGo.ArtGoApp.utils.RestClient;
@@ -54,9 +55,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.ClusterManager;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.nineoldandroids.view.ViewPropertyAnimator;
@@ -154,6 +152,8 @@ public class ActivityHome extends AppCompatActivity
     private ArrayList<String> mLocationMarkers      = new ArrayList<>();
     private ArrayList<String> mCategoryIds          = new ArrayList<>();
     private ArrayList<String> mCategoryNames        = new ArrayList<>();
+    private ArrayList<String> mCategoryIcon        = new ArrayList<>();
+    private ArrayList<Integer> mIconId = new ArrayList<>();
     private ArrayList<String> mTypeId        = new ArrayList<>();
     // To handle LocationDistance in String
     private ArrayList<String> mLocationDistancesString    = new ArrayList<>();
@@ -890,6 +890,8 @@ public class ActivityHome extends AppCompatActivity
             // Clear arraylist variable first before used
             mCategoryIds.clear();
             mCategoryNames.clear();
+            mCategoryIcon.clear();
+            mIconId.clear();
         }
 
         @Override
@@ -903,6 +905,7 @@ public class ActivityHome extends AppCompatActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             // Set category data to spinner
+            /*
             ArrayAdapter<String> categoryAdapter;
             categoryAdapter = new ArrayAdapter<>(
                     getApplicationContext(),
@@ -910,6 +913,11 @@ public class ActivityHome extends AppCompatActivity
                     mCategoryNames
             );
             categoryAdapter.setDropDownViewResource(R.layout.layout_spinner);
+            */
+            for(int i = 0; i < mCategoryIcon.size(); i++){
+                mIconId.add(getResources().getIdentifier(mCategoryIcon.get(i),"mipmap",getPackageName()));
+            }
+            CustomAdapter categoryAdapter = new CustomAdapter(getApplicationContext(),mIconId,mCategoryNames);
             mSpnCategory.setAdapter(categoryAdapter);
         }
     }
@@ -946,21 +954,6 @@ public class ActivityHome extends AppCompatActivity
         }
     }*/
 
-    // Method to get data from database
-    /*public void getCategoryFromDatabase(){
-        ArrayList<ArrayList<Object>> dataCategory = mDBHelper.getAllCategoriesData();
-
-        // Ad "All Places" in first row
-        mCategoryIds.add("0");
-        mCategoryNames.add(getString(R.string.all_places));
-        for(int i = 0; i< dataCategory.size(); i++){
-            ArrayList<Object> row = dataCategory.get(i);
-
-            mCategoryIds.add(row.get(0).toString());
-            mCategoryNames.add(row.get(1).toString());
-        }
-    }*/
-
     //Method to get data from Rest Server
     public void getCategoryFromRestServer(){
         JSONArray locationType = RestClient.getAllCategoriesData();
@@ -968,11 +961,13 @@ public class ActivityHome extends AppCompatActivity
         // Add "All Places" in first row
         mCategoryIds.add("0");
         mCategoryNames.add(getString(R.string.all_places));
+        mCategoryIcon.add("ic_marker_all");
         for(int i = 0; i< locationType.length(); i++){
             try{
                 JSONObject row = locationType.getJSONObject(i);
                 mCategoryIds.add(row.get("id").toString());
                 mCategoryNames.add(row.get("name").toString());
+                mCategoryIcon.add(row.get("marker").toString());
         }catch (Exception e){
                 e.printStackTrace();
             }

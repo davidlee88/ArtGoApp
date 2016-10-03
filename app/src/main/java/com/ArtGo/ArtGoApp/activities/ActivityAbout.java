@@ -10,7 +10,6 @@ import com.ArtGo.ArtGoApp.R;
 
 
 /**
- *
  * ActivityAbout is created to display app information such as app name,
  * version, and developer name. Created using PreferenceActivity.
  */
