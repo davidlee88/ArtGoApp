@@ -1,8 +1,10 @@
 package com.ArtGo.ArtGoApp.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
@@ -21,6 +23,8 @@ public class ActivitySplash extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         // Configuration in Android API below 21 to set window to full screen.
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -51,9 +55,44 @@ public class ActivitySplash extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            // When progress finished, open ActivityHome
-            Intent homeIntent = new Intent(getApplicationContext(), ActivityHome.class);
-            startActivity(homeIntent);
+
+            //Thread to make introduction screen only run once when user first launch the app.
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //  Initialize SharedPreferences
+                    SharedPreferences getPrefs = PreferenceManager
+                            .getDefaultSharedPreferences(getBaseContext());
+
+                    //  Create a new boolean and preference and set it to true
+                    boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+
+                    //  If the activity has never started before...
+                    if (isFirstStart) {
+
+                        //  Launch app intro
+                        Intent i = new Intent(ActivitySplash.this, ActivityIntro.class);
+                        startActivity(i);
+                        //  Make a new preferences editor
+                        SharedPreferences.Editor e = getPrefs.edit();
+
+                        //  Edit preference to make it false because we don't want this to run again
+                        e.putBoolean("firstStart", false);
+
+                        //  Apply changes
+                        e.apply();
+                    }else{
+                        // When progress finished, open ActivityHome
+                        //Intent homeIntent = new Intent(getApplicationContext(), ActivityHome.class);
+                        Intent homeIntent = new Intent(ActivitySplash.this, ActivityIntro.class);
+                        startActivity(homeIntent);
+                    }
+                }
+            });
+
+            // Start the thread
+            t.start();
+
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
         }
     }

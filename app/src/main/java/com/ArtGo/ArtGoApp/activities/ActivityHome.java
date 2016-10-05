@@ -5,12 +5,14 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +57,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.nineoldandroids.view.ViewPropertyAnimator;
@@ -70,13 +73,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
- *
  *
  * ActivityHome is created to display locations data in map view and list view.
  * Created using AppCompatActivity.
@@ -153,6 +157,7 @@ public class ActivityHome extends AppCompatActivity
     private ArrayList<String> mCategoryIds          = new ArrayList<>();
     private ArrayList<String> mCategoryNames        = new ArrayList<>();
     private ArrayList<String> mCategoryIcon        = new ArrayList<>();
+    private ArrayList<String> mEndDate        = new ArrayList<>();
     private ArrayList<Integer> mIconId = new ArrayList<>();
     private ArrayList<String> mTypeId        = new ArrayList<>();
     // To handle LocationDistance in String
@@ -181,6 +186,7 @@ public class ActivityHome extends AppCompatActivity
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
 
         // Connect view objects with view ids in xml
         CircleProgressBar
@@ -1083,6 +1089,7 @@ public class ActivityHome extends AppCompatActivity
         mLocationDistances.clear();
         mLocationMarkers.clear();
         mLocationDistancesString.clear();
+        mEndDate.clear();
         mTypeId.clear();
 
         // Store data to arraylist variables
@@ -1112,6 +1119,8 @@ public class ActivityHome extends AppCompatActivity
 
                 // For trigger variable mLocationDistancesString
                 mLocationDistancesString.add(String.format("%.2f", paramDistance));
+                String[] endDates = row.get("endDate").toString().split("T");
+                mEndDate.add(endDates[0]);
                 mTypeId.add(row.get("type").toString());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1158,16 +1167,34 @@ public class ActivityHome extends AppCompatActivity
                         mLocationAddresses.get(i),
                         BitmapDescriptorFactory.fromResource(marker));
             }else {
-                item = new MyItem(id, new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
-                        Double.valueOf(mLocationLongitudes.get(i))),
-                        mLocationNames.get(i),
-                        "Incoming Art Event",
-                        BitmapDescriptorFactory.fromResource(marker));
+                Date today = new Date();
+                Date eventEnd = null;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                try{
+                    eventEnd = sdf.parse(mEndDate.get(i));
+                }catch (Exception e){
+
+                }
+                if(eventEnd != null && today.before(eventEnd)) {
+                    item = new MyItem(id, new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
+                            Double.valueOf(mLocationLongitudes.get(i))),
+                            mLocationNames.get(i),
+                            "Active/Incoming Art Event",
+                            BitmapDescriptorFactory.fromResource(marker));
+                } else {
+                    item = new MyItem(id, new LatLng(Double.valueOf(mLocationLatitudes.get(i)),
+                            Double.valueOf(mLocationLongitudes.get(i))),
+                            mLocationNames.get(i),
+                            "Expired Art Event",
+                            BitmapDescriptorFactory.fromResource(marker));
+                }
             }
+
             //Add Items to ClusterManager object
             mClusterManager.addItem(item);
             mLocationIdsOnMarkers.put(item.getId(), mLocationIds.get(i));
             mLocationTypeOnMarkers.put(item.getId(), mTypeId.get(i));
+
             //Info window click listener
             mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> (){
                 @Override
@@ -1181,6 +1208,18 @@ public class ActivityHome extends AppCompatActivity
                     }
                 }
             });
+
+            //Cluster click listener
+            mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyItem>() {
+                        @Override
+                        public boolean onClusterClick(final Cluster<MyItem> cluster) {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    cluster.getPosition(), (float) Math.floor(mMap
+                                            .getCameraPosition().zoom + 1)), 300,
+                                    null);
+                            return true;
+                        }
+                    });
 
            /* mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MyItem> (){
                 @Override
@@ -1215,7 +1254,7 @@ public class ActivityHome extends AppCompatActivity
         int j;
         boolean flag = true;   // set flag to true to begin first pass
         Float tempDistance;   //holding variable
-        String tempId, tempName, tempLatitude, tempLongitude, tempAddress, tempImage, tempMarker,tempType;
+        String tempId, tempName, tempLatitude, tempLongitude, tempAddress, tempImage, tempMarker,tempType,tempEndDate;
         while ( flag )
         {
             flag= false;    //set flag to false awaiting a possible swap
@@ -1234,6 +1273,7 @@ public class ActivityHome extends AppCompatActivity
                     tempImage       = mLocationImages.get(j);
                     tempMarker      = mLocationMarkers.get(j);
                     tempType        = mTypeId.get(j);
+                    tempEndDate     = mEndDate.get(j);
 
                     mLocationDistances.set(j, mLocationDistances.get(j + 1));
 
@@ -1249,7 +1289,7 @@ public class ActivityHome extends AppCompatActivity
                     mLocationImages.set(j,mLocationImages.get(j+1) );
                     mLocationMarkers.set(j,mLocationMarkers.get(j+1) );
                     mTypeId.set(j,mTypeId.get(j+1));
-
+                    mEndDate.set(j,mEndDate.get(j+1));
                     mLocationDistances.set(j + 1, tempDistance);
                     mLocationDistancesString.set(j + 1, String.format("%.2f", tempDistance));
 
@@ -1261,6 +1301,7 @@ public class ActivityHome extends AppCompatActivity
                     mLocationImages.set(j+1,tempImage);
                     mLocationMarkers.set(j+1,tempMarker);
                     mTypeId.set(j+1,tempType);
+                    mEndDate.set(j+1,tempEndDate);
 
                     flag = true;              //shows a swap occurred
                 } else {

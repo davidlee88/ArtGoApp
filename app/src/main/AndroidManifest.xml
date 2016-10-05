@@ -12,7 +12,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <!--
@@ -21,27 +20,30 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
 
         <!-- Configuration for Google Maps Android API -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!--Face book sdk-->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <!-- Face book sdk -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <!-- Put Google Maps Android API key here-->
+        <!-- Put Google Maps Android API key here -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDo-scaWn7Ddy1s1Hc6wdo4IIIabOH5utM" />
+
         <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivitySplash"
+            android:name=".activities.ActivitySplash"
             android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait">
@@ -52,28 +54,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivityHome"
+            android:name=".activities.ActivityHome"
             android:label=""
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivityDetail"
+            android:name=".activities.ActivityDetail"
             android:label=""
             android:launchMode="singleTop"
-            android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityHome"
-            android:screenOrientation="portrait">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
-        </activity>
-        <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivityEventDetail"
-            android:label=""
-            android:launchMode="singleTop"
-            android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityHome"
+            android:parentActivityName=".activities.ActivityHome"
             android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -82,9 +71,21 @@
                 android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
         </activity>
         <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivityAbout"
+            android:name=".activities.ActivityEventDetail"
+            android:label=""
+            android:launchMode="singleTop"
+            android:parentActivityName=".activities.ActivityHome"
+            android:screenOrientation="portrait">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
+        </activity>
+        <activity
+            android:name=".activities.ActivityAbout"
             android:label="@string/about"
-            android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityHome"
+            android:parentActivityName=".activities.ActivityHome"
             android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -93,9 +94,9 @@
                 android:value="com.ArtGo.ArtGoApp.activities.ActivityHome" />
         </activity>
         <activity
-            android:name="com.ArtGo.ArtGoApp.activities.ActivityDirection"
+            android:name=".activities.ActivityDirection"
             android:label="@string/direction"
-            android:parentActivityName="com.ArtGo.ArtGoApp.activities.ActivityDetail"
+            android:parentActivityName=".activities.ActivityDetail"
             android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -108,16 +109,23 @@
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
-        <!--Facebook activity-->
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        <!-- Facebook activity -->
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            tools:replace="android:theme"
-            android:label="@string/app_name"/>
-        <provider android:authorities="com.facebook.app.FacebookContentProvider325861297747191"
+            tools:replace="android:theme" />
+
+        <provider
             android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider325861297747191"
             android:exported="true" />
+
+        <activity android:name=".activities.ActivityIntro">
+
+
+        </activity>
     </application>
 
 </manifest>
