@@ -192,6 +192,7 @@ public class ActivityDetail extends ActivityBase implements
         // Get location data from database in background using asyntask class
         new SyncGetLocations().execute();
         //
+
     }
 
     // Method to show snackbar
@@ -285,11 +286,21 @@ public class ActivityDetail extends ActivityBase implements
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
+            //set button style when there is no website information
+            LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
+            if(mLocationWebsite.equals("null")){
+                mBtnWebsite.setAlpha(.5f);
+            }
             // When finished retrieve data from database, display data to the views
-            mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + "</strong>  " +
-                    "<em>" + mLocationAddress + "</em><br /><strong>"+getString(R.string.author)+"</strong>  <em>"+mLocationAuthor+"</em><br />" +
-                    "<strong>"+getString(R.string.date)+"</strong>  <em>"+mLocationDate+"</em><br /><strong>"+getString(R.string.structure)+"</strong>  <em>"+mLocationStructure+"</em><br /><br />" + mLocationDescription, true);
+            if(mLocationAuthor.equals("null")||mLocationStructure.equals("null")||mLocationDate.equals("null")){
+                mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + ":</strong>  " +
+                        "<em>" + mLocationAddress + "</em>" +
+                        "<br /><br /><strong>Description:</strong>" + mLocationDescription, true);
+            }else {
+                mTxtDescription.setHtmlFromString("<strong>" + getString(R.string.address) + ":</strong>  " +
+                        "<em>" + mLocationAddress + "</em><br /><strong>" + getString(R.string.author) + ":</strong>  <em>" + mLocationAuthor + "</em><br />" +
+                        "<strong>" + getString(R.string.date) + ":</strong>  <em>" + mLocationDate + "</em><br /><strong>" + getString(R.string.structure) + ":</strong>  <em>" + mLocationStructure + "</em><br /><br /><strong>Description:</strong>" + mLocationDescription, true);
+            }
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
             String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +
@@ -524,10 +535,12 @@ public class ActivityDetail extends ActivityBase implements
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.btnWebsite:
-                // If website address is not available display snackbar,
+                // If website address is not available display snackbar and set button grey,
                 // else open browser to access website
                 v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
+                LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
                 if(mLocationWebsite.equals("null")){
+                    mBtnWebsite.setClickable(false);
                     showSnackBar(getString(R.string.no_website_available));
                 }else {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW);

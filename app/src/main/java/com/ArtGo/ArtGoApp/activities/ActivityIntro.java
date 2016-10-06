@@ -1,20 +1,14 @@
 package com.ArtGo.ArtGoApp.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-
 import com.ArtGo.ArtGoApp.R;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 /**
- * Moaoran Li
  * ActivityIntro is created to display introduction screen.
  * Created using paolortolo appintro.
  */

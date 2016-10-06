@@ -62,7 +62,7 @@
                     android:layout_below="@+id/txtRecipeName"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:visibility="invisible"/>
+                    android:visibility="visible"/>
             </LinearLayout>
 
             <!-- Location distance -->

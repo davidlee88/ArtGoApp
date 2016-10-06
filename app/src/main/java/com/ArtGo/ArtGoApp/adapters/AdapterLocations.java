@@ -16,6 +16,7 @@ import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
 import com.ArtGo.ArtGoApp.utils.MySingleton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -30,7 +31,7 @@ public class AdapterLocations extends RecyclerView.Adapter<AdapterLocations.View
     private ArrayList<String> mLocationAddresses;
     private ArrayList<String> mLocationDistances;
     private ArrayList<String> mLocationImages;
-
+    private ArrayList<String> mTypeId;
     // Create listener, mContext and imageloader objects,
     // and also variables to store image width and height sizes
     private OnTapListener onTapListener;
@@ -45,7 +46,7 @@ public class AdapterLocations extends RecyclerView.Adapter<AdapterLocations.View
         this.mLocationAddresses = new ArrayList<>();
         this.mLocationDistances = new ArrayList<>();
         this.mLocationImages = new ArrayList<>();
-
+        this.mTypeId = new ArrayList<>();
         mContext = context;
 
         // Get image width and height sizes
@@ -79,7 +80,24 @@ public class AdapterLocations extends RecyclerView.Adapter<AdapterLocations.View
 
         // Set data to view
         viewHolder.mTxtLocationName.setText(mLocationNames.get(position));
-        viewHolder.mTxtLocationAddress.setText(mLocationAddresses.get(position));
+        String type = mTypeId.get(position);
+        //all locations show the type name
+        switch (type){
+            case "1": viewHolder.mTxtLocationAddress.setText("Art Work");
+                break;
+            case "2": viewHolder.mTxtLocationAddress.setText("Fountain");
+                break;
+            case "3": viewHolder.mTxtLocationAddress.setText("Monument");
+                break;
+            case "4": viewHolder.mTxtLocationAddress.setText("Art Gallery");
+                break;
+            case "5": viewHolder.mTxtLocationAddress.setText("Art Museum");
+                break;
+            case "6": viewHolder.mTxtLocationAddress.setText("Art Event");
+                break;
+        }
+
+        //viewHolder.mTxtLocationAddress.setText(mLocationAddresses.get(position));
 
         String mFinalDistance = String.valueOf(mLocationDistances.get(position))+" "+
                 mContext.getResources().getString(R.string.km);
@@ -140,7 +158,8 @@ public class AdapterLocations extends RecyclerView.Adapter<AdapterLocations.View
                            ArrayList<String> locationNames,
                            ArrayList<String> locationAddresses,
                            ArrayList<String> locationDistances,
-                           ArrayList<String> locationImages)
+                           ArrayList<String> locationImages,
+                          ArrayList<String> typeid)
     {
 
         this.mLocationIds.clear();
@@ -158,6 +177,8 @@ public class AdapterLocations extends RecyclerView.Adapter<AdapterLocations.View
         this.mLocationImages.clear();
         this.mLocationImages.addAll(locationImages);
 
+        this.mTypeId.clear();
+        this.mTypeId.addAll(typeid);
 
         this.notifyDataSetChanged();
     }

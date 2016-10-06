@@ -149,7 +149,7 @@ public class ActivityEventDetail extends ActivityBase implements
         mTxtLocationCategory      = (TextView) findViewById(R.id.txtLocationCategory);
         mTxtLocationDistance      = (TextView) findViewById(R.id.txtLocationDistance);
         //Set calendar view
-        compactCalendarView = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
+        /*compactCalendarView = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
         compactCalendarView.setLocale(TimeZone.getDefault(), Locale.ENGLISH);
         compactCalendarView.setUseThreeLetterAbbreviation(true);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -157,7 +157,7 @@ public class ActivityEventDetail extends ActivityBase implements
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.ENGLISH);
         toolbar.setTitle(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
-
+         */
         //mAdView                   = (AdView) findViewById(R.id.adView);
         /*LinearLayout mBtnCall     = (LinearLayout) findViewById(R.id.btnCall);
         LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
@@ -299,17 +299,22 @@ public class ActivityEventDetail extends ActivityBase implements
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            //if the location doesn't have website, the button will be grey
+            LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
+            if(mLocationWebsite.equals("null")){
+                mBtnWebsite.setAlpha(.5f);
+            }
             // When finished retrieve data from database, display data to the views
-            mTxtDescription.setHtmlFromString("<strong>Start Date</strong>  " +
-                    "<em>" + mLocationDate + "</em><br /><strong>End Date</strong>  <em>"+mLocationEndDate+"</em><br />" +
-                    "<br />" + mLocationDescription, true);
+            mTxtDescription.setHtmlFromString("<strong>Start Date: </strong>  " +
+                    "<em>" + mLocationDate + "</em><br /><strong>End Date: </strong>  <em>"+mLocationEndDate+"</em>" +
+                    "<br /><br /><strong>Description: </strong>" + mLocationDescription, true);
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
             String mFinalDistance = String.format("%.2f", (mDistance[0] / 1000)) + " " +
                     getString(R.string.km);
             mTxtLocationDistance.setText(mFinalDistance);
             //set up calendar view
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
+            /*SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
             try {
                 Date startDate = format.parse(mLocationDate);
                 Date endDate = format.parse(mLocationEndDate);
@@ -346,7 +351,7 @@ public class ActivityEventDetail extends ActivityBase implements
                 });
             } catch (java.text.ParseException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             if(mLocationImage.toLowerCase().contains("http")){
                 mImageLoader.get(mLocationImage,
@@ -365,7 +370,7 @@ public class ActivityEventDetail extends ActivityBase implements
                     .position(new LatLng(Double.valueOf(mLocationLatitude),
                             Double.valueOf(mLocationLongitude)))
                     .icon(BitmapDescriptorFactory.fromResource(marker))
-                    .snippet("New Event")
+                    .snippet("Event is here!")
                     .title(mLocationName));
 
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
@@ -557,7 +562,9 @@ public class ActivityEventDetail extends ActivityBase implements
                 // If website address is not available display snackbar,
                 // else open browser to access website
                 v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
+                LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
                 if(mLocationWebsite.equals("null")){
+                    mBtnWebsite.setClickable(false);
                     showSnackBar(getString(R.string.no_website_available));
                 }else {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW);

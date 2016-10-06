@@ -5,14 +5,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -106,7 +104,7 @@ public class ActivityHome extends AppCompatActivity
     private GoogleMap mMap;
     private MaterialDialog progressDialog;
 
-    // Create adapter and dbhelper objects
+    // Create adapter objects
     private AdapterLocations mAdapter;
     private DBHelperLocations mDBHelper;
 
@@ -166,7 +164,6 @@ public class ActivityHome extends AppCompatActivity
     // Create hashmap variable to store marker id and location id
     private HashMap<String, String> mLocationIdsOnMarkers = new HashMap<>();
     private HashMap<String, String> mLocationTypeOnMarkers = new HashMap<>();
-
     // Create string variable to store category id
     private String mSelectedCategoryId = "0";
 
@@ -1015,12 +1012,6 @@ public class ActivityHome extends AppCompatActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            // Set data to adapter
-            mAdapter.updateList(mLocationIds, mLocationNames,
-                    mLocationAddresses, mLocationDistancesString, mLocationImages);
-
-            // Set adapter to recycler view
-            mList.setAdapter(mAdapter);
 
             // if this is the first time app launched, than set it to false
             if(mIsAppFirstLaunched){
@@ -1030,6 +1021,13 @@ public class ActivityHome extends AppCompatActivity
 
             // Set up map after getting location data from database
             setupMarker();
+
+            // Set data to adapter
+            mAdapter.updateList(mLocationIds, mLocationNames,
+                    mLocationAddresses, mLocationDistancesString, mLocationImages,mTypeId);
+
+            // Set adapter to recycler view
+            mList.setAdapter(mAdapter);
         }
     }
 
