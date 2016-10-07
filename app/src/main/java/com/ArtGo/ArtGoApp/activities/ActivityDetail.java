@@ -16,6 +16,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -189,9 +191,14 @@ public class ActivityDetail extends ActivityBase implements
         // Check databases
         checkDatabase();
 
-        // Get location data from database in background using asyntask class
-        new SyncGetLocations().execute();
-        //
+        // Check network
+        if(isNetworkAvailable()) {
+            // Get location data from database in background using asyntask class
+            new SyncGetLocations().execute();
+        }else{
+            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                    Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -533,6 +540,7 @@ public class ActivityDetail extends ActivityBase implements
 
     @Override
     public void onClick(View v) {
+        if(isNetworkAvailable()){
         switch(v.getId()){
             case R.id.btnWebsite:
                 // If website address is not available display snackbar and set button grey,
@@ -597,6 +605,10 @@ public class ActivityDetail extends ActivityBase implements
                 v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
                 sharePhotoToFB();
                 break;
+        }
+        }else{
+            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1091,5 +1103,13 @@ public class ActivityDetail extends ActivityBase implements
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //Check Internet connection
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

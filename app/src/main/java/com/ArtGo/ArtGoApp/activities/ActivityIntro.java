@@ -7,26 +7,27 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import com.ArtGo.ArtGoApp.R;
 import com.github.paolorotolo.appintro.AppIntro;
+import com.github.paolorotolo.appintro.AppIntro2;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 /**
  * ActivityIntro is created to display introduction screen.
  * Created using paolortolo appintro.
  */
-public class ActivityIntro extends AppIntro {
+public class ActivityIntro extends AppIntro2 {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Add slides
-        addSlide(AppIntroFragment.newInstance("First slide", "Description1", R.drawable.intro_slide1, Color.parseColor("#52BE80")));
-        addSlide(AppIntroFragment.newInstance("Second slide", "Description2", R.drawable.intro_slide2, Color.parseColor("#5DADE2")));
-        addSlide(AppIntroFragment.newInstance("Third slide", "Description3", R.drawable.intro_slide3, Color.parseColor("#F4D03F")));
-        addSlide(AppIntroFragment.newInstance("Fourth slide", "Description4", R.drawable.intro_slide4, Color.parseColor("#AF7AC5")));
+        addSlide(AppIntroFragment.newInstance("Welcome to ArtGo!", "Discover public art in VIC", R.drawable.intro_slide1, Color.parseColor("#52BE80")));
+        addSlide(AppIntroFragment.newInstance("Start ur journey", "View all arts on Map", R.drawable.intro_slide2, Color.parseColor("#5DADE2")));
+        addSlide(AppIntroFragment.newInstance("Select an art", "Get more knowledge of the art", R.drawable.intro_slide3, Color.parseColor("#F4D03F")));
+        addSlide(AppIntroFragment.newInstance("Festival & Events", "Go & attend the best art activity around you", R.drawable.intro_slide4, Color.parseColor("#AF7AC5")));
 
         //Setting up
-        setBarColor(Color.parseColor("#1e4872"));
-        setSeparatorColor(Color.parseColor("#2196F3"));
-        showSkipButton(true);
+        //setBarColor(Color.parseColor("#1e4872"));
+        //setSeparatorColor(Color.parseColor("#2196F3"));
+        //showSkipButton(true);
         setFadeAnimation();
         setVibrate(true);
         setVibrateIntensity(30);

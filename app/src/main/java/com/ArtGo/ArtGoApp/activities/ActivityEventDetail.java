@@ -15,6 +15,8 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -202,9 +204,14 @@ public class ActivityEventDetail extends ActivityBase implements
         // Check databases
         checkDatabase();
 
-        // Get location data from database in background using asyntask class
-        new SyncGetLocations().execute();
-        //
+        // Check network
+        if(isNetworkAvailable()) {
+            // Get location data from database in background using asyntask class
+            new SyncGetLocations().execute();
+        }else{
+            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     // Method to show snackbar
@@ -557,70 +564,75 @@ public class ActivityEventDetail extends ActivityBase implements
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.btnWebsite:
-                // If website address is not available display snackbar,
-                // else open browser to access website
-                v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
-                LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
-                if(mLocationWebsite.equals("null")){
-                    mBtnWebsite.setClickable(false);
-                    showSnackBar(getString(R.string.no_website_available));
-                }else {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-                    browserIntent.setData(Uri.parse(mLocationWebsite.trim()));
-                    startActivity(browserIntent);
-                }
-                break;
+        if(isNetworkAvailable()) {
+            switch (v.getId()) {
+                case R.id.btnWebsite:
+                    // If website address is not available display snackbar,
+                    // else open browser to access website
+                    v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                    LinearLayout mBtnWebsite = (LinearLayout) findViewById(R.id.btnWebsite);
+                    if (mLocationWebsite.equals("null")) {
+                        mBtnWebsite.setClickable(false);
+                        showSnackBar(getString(R.string.no_website_available));
+                    } else {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                        browserIntent.setData(Uri.parse(mLocationWebsite.trim()));
+                        startActivity(browserIntent);
+                    }
+                    break;
             /*case R.id.btnCall:
                 makeACall();
                 break;*/
-            case R.id.flatDirection:
-                new MaterialDialog.Builder(this)
-                .title(R.string.open_with)
-                .items(R.array.app_list)
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog dialog, View view, int which,
-                                            CharSequence text) {
-                        switch (which) {
-                            case 0:
-                                // Send location latitude and longitude to Google Maps app
-                                openGoogleMaps();
-                                break;
-                            case 1:
-                                // Or use ArtGo to get direction from user position to the location
-                                Intent directionIntent = new Intent(ActivityEventDetail.this, ActivityDirection.class);
-                                directionIntent.putExtra(Utils.ARG_LOCATION_NAME, mLocationName);
-                                directionIntent.putExtra(Utils.ARG_LOCATION_ADDRESSES, mLocationAddress);
-                                directionIntent.putExtra(Utils.ARG_LOCATION_LATITUDE, mLocationLatitude);
-                                directionIntent.putExtra(Utils.ARG_LOCATION_LONGITUDE, mLocationLongitude);
-                                directionIntent.putExtra(Utils.ARG_LOCATION_MARKER, mLocationMarker);
-                                startActivity(directionIntent);
-                                overridePendingTransition(R.anim.open_next, R.anim.close_main);
-                                break;
-                        }
-                    }
-                }).show();
-                break;
-            case R.id.image:
-                if(mLocationImage.toLowerCase().contains("http")){
-                    Bitmap bitmap = mImageLoader.get(mLocationImage,
-                            ImageLoader.getImageListener(mImgLocationImage,
-                                    R.mipmap.empty_photo, R.mipmap.empty_photo)).getBitmap();
-                    zoomImageFromThumbInternet(mImgLocationImage,bitmap);
+                case R.id.flatDirection:
+                    new MaterialDialog.Builder(this)
+                            .title(R.string.open_with)
+                            .items(R.array.app_list)
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog dialog, View view, int which,
+                                                        CharSequence text) {
+                                    switch (which) {
+                                        case 0:
+                                            // Send location latitude and longitude to Google Maps app
+                                            openGoogleMaps();
+                                            break;
+                                        case 1:
+                                            // Or use ArtGo to get direction from user position to the location
+                                            Intent directionIntent = new Intent(ActivityEventDetail.this, ActivityDirection.class);
+                                            directionIntent.putExtra(Utils.ARG_LOCATION_NAME, mLocationName);
+                                            directionIntent.putExtra(Utils.ARG_LOCATION_ADDRESSES, mLocationAddress);
+                                            directionIntent.putExtra(Utils.ARG_LOCATION_LATITUDE, mLocationLatitude);
+                                            directionIntent.putExtra(Utils.ARG_LOCATION_LONGITUDE, mLocationLongitude);
+                                            directionIntent.putExtra(Utils.ARG_LOCATION_MARKER, mLocationMarker);
+                                            startActivity(directionIntent);
+                                            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+                                            break;
+                                    }
+                                }
+                            }).show();
+                    break;
+                case R.id.image:
+                    if (mLocationImage.toLowerCase().contains("http")) {
+                        Bitmap bitmap = mImageLoader.get(mLocationImage,
+                                ImageLoader.getImageListener(mImgLocationImage,
+                                        R.mipmap.empty_photo, R.mipmap.empty_photo)).getBitmap();
+                        zoomImageFromThumbInternet(mImgLocationImage, bitmap);
 
-                } else {
-                    int image = getResources().getIdentifier(mLocationImage, "drawable",
-                            getPackageName());
-                    zoomImageFromThumbLocal(mImgLocationImage, image);
-                }
-                //mScrollView.setVisibility(View.INVISIBLE);
-                break;
-            case R.id.btnShare1:
-                v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
-                sharePhotoToFB();
-                break;
+                    } else {
+                        int image = getResources().getIdentifier(mLocationImage, "drawable",
+                                getPackageName());
+                        zoomImageFromThumbLocal(mImgLocationImage, image);
+                    }
+                    //mScrollView.setVisibility(View.INVISIBLE);
+                    break;
+                case R.id.btnShare1:
+                    v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                    sharePhotoToFB();
+                    break;
+            }
+        }else{
+            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1119,5 +1131,13 @@ public class ActivityEventDetail extends ActivityBase implements
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //Method to check the internet connectivity
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

@@ -3,14 +3,18 @@ package com.ArtGo.ArtGoApp.activities;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +29,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.ArtGo.ArtGoApp.adapters.CustomAdapter;
 import com.ArtGo.ArtGoApp.utils.MyItem;
@@ -235,75 +240,88 @@ public class ActivityHome extends AppCompatActivity
         // Set adapter object
         mAdapter = new AdapterLocations(this);
 
-        // Get category data
-        //new SyncGetCategories().execute();
-        new SyncGetTypes().execute();
-
         // Build Google API client. Check if Google play services is available and get user position.
         buildGoogleApiClient();
 
-        // Listener for spinner when item clicked
-        mSpnCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                // Save selected category id whenever category change
-                mSelectedCategoryId = mCategoryIds.get(i);
+        // Get category data
+        //new SyncGetCategories().execute();
+        if(isNetworkAvailable()) {
+            new SyncGetTypes().execute();
+            // Listener for spinner when item clicked
+            mSpnCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    // Save selected category id whenever category change
+                    mSelectedCategoryId = mCategoryIds.get(i);
 
-                // If this is not the first time of the app run, load data in background
-                // using asynctask class
-                if(!mIsAppFirstLaunched) {
-                    if (mCurrentLocation != null) {
-                        new SyncGetLocations().execute();
+                    // If this is not the first time of the app run, load data in background
+                    // using asynctask class
+                    if (!mIsAppFirstLaunched) {
+                        if (mCurrentLocation != null && isNetworkAvailable()) {
+                            new SyncGetLocations().execute();
+                        } else{
+                            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
 
-            }
-        });
-
-        // Listener for recycler view when item clicked
-        mAdapter.setOnTapListener(new OnTapListener() {
-            @Override
-            public void onTapView(int position) {
-            // Open ActivityDetail when item in recyclerview clicked
-
-                String type = mLocationTypeOnMarkers.get(Integer.toString(position));
-                if(!type.equals("6")) {
-                    Intent detailIntent = new Intent(getApplicationContext(), ActivityDetail.class);
-                    detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
-                    startActivity(detailIntent);
-                }else{
-                    Intent detailIntent = new Intent(getApplicationContext(), ActivityEventDetail.class);
-                    detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
-                    startActivity(detailIntent);
                 }
-                overridePendingTransition(R.anim.open_next, R.anim.close_main);
-            }
-        });
+            });
 
-        // Handle item menu in toolbar
-        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.menuView:
-                        // Change data view to list view or map view
-                        changeView();
-                        return true;
-                    case R.id.menuAbout:
-                        // Open ActivityAbout when about item on toolbar clicked
-                        Intent aboutIntent = new Intent(getApplicationContext(), ActivityAbout.class);
-                        startActivity(aboutIntent);
+            // Listener for recycler view when item clicked
+            mAdapter.setOnTapListener(new OnTapListener() {
+                @Override
+                public void onTapView(int position) {
+                    if(isNetworkAvailable()) {
+                        // Open ActivityDetail when item in recyclerview clicked
+                        String type = mLocationTypeOnMarkers.get(Integer.toString(position));
+                        if (!type.equals("6")) {
+                            Intent detailIntent = new Intent(getApplicationContext(), ActivityDetail.class);
+                            detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
+                            startActivity(detailIntent);
+                        } else {
+                            Intent detailIntent = new Intent(getApplicationContext(), ActivityEventDetail.class);
+                            detailIntent.putExtra(Utils.ARG_LOCATION_ID, mLocationIds.get(position));
+                            startActivity(detailIntent);
+                        }
                         overridePendingTransition(R.anim.open_next, R.anim.close_main);
-                        return true;
-                    default:
-                        return true;
+                    }else{
+                        Toast.makeText(getApplicationContext(),"No Internet Connection",
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            Toast.makeText(getApplicationContext(),"No Internet Connection",
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+            // Handle item menu in toolbar
+            mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.menuView:
+                            // Change data view to list view or map view
+                            changeView();
+                            return true;
+                        case R.id.menuAbout:
+                            // Open ActivityAbout when about item on toolbar clicked
+                            Intent aboutIntent = new Intent(getApplicationContext(), ActivityAbout.class);
+                            startActivity(aboutIntent);
+                            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+                            return true;
+                        default:
+                            return true;
+                    }
+                }
+            });
+
     }
 
     // Method to hide fab buttons with scale animation
@@ -1197,12 +1215,17 @@ public class ActivityHome extends AppCompatActivity
             mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> (){
                 @Override
                 public void onClusterItemInfoWindowClick(MyItem item) {
+                    if(isNetworkAvailable()) {
                         String id = mLocationIdsOnMarkers.get(item.getId());
                         String type = mLocationTypeOnMarkers.get(item.getId());
-                    if(!type.equals("6")) {
-                        loadDetail(id);
-                    } else {
-                        loadEventDetail(id);
+                        if (!type.equals("6")) {
+                            loadDetail(id);
+                        } else {
+                            loadEventDetail(id);
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(),"No Internet Connection",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -1449,6 +1472,14 @@ public class ActivityHome extends AppCompatActivity
             mAdView.destroy();
         }
         mDBHelper.close();
+    }
+
+    //Method to check the internet connectivity
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**
