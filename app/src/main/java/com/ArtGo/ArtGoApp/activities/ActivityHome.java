@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -899,7 +900,7 @@ public class ActivityHome extends AppCompatActivity
                     setMapType(mSelectedMapType);
                     return true;
                 }
-            }).positiveText(R.string.select)
+            }).positiveText(R.string.select).backgroundColor(Color.parseColor("#5DADE2"))
             .show();
     }
     //sync method to get types of locations

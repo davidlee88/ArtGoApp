@@ -29,7 +29,7 @@
     <string name="pref_app_title">Application Name</string>
     <string name="pref_app_summary">ArtGo</string>
     <string name="pref_version_title">Build Version</string>
-    <string name="pref_version_summary">Version 3.7</string>
+    <string name="pref_version_summary">Version 3.8</string>
     <string name="pref_developer_title">Developer</string>
     <string name="pref_developer_summary">Moaoran Li</string>
     <string name="pref_copyright_title">Copyright</string>
@@ -42,7 +42,7 @@
     <!-- Sharing content -->
     <string name="share_to">Share to</string>
     <string name="permission">Permission</string>
-    <string name="subject">Perfect app to find nice art work in city</string>
+    <string name="subject">Perfect app to find nice art work</string>
     <string name="message"> is city app that will help you explore the city art work. Download it at </string>
     <string name="open_with">Open with:</string>
     <string name="phone">Phone:</string>
@@ -73,7 +73,7 @@
     <string name="play_services_available">Google Play services is available</string>
     <array name="app_list">
         <item>Google Maps</item>
-        <item>ArtGo</item>
+        <!--<item>ArtGo</item>-->
     </array>
 
     <!-- Google Play url. Change your.package.name with your own package name. -->

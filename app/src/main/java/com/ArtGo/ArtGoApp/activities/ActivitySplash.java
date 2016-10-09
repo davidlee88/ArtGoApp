@@ -84,6 +84,7 @@ public class ActivitySplash extends AppCompatActivity {
                     }else{
                         // When progress finished, open ActivityHome
                         Intent homeIntent = new Intent(getApplicationContext(), ActivityHome.class);
+                        //this part is for testing
                         //Intent homeIntent = new Intent(ActivitySplash.this, ActivityIntro.class);
                         startActivity(homeIntent);
                     }

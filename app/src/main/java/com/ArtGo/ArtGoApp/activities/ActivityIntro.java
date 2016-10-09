@@ -13,21 +13,21 @@ import com.github.paolorotolo.appintro.AppIntroFragment;
  * ActivityIntro is created to display introduction screen.
  * Created using paolortolo appintro.
  */
-public class ActivityIntro extends AppIntro2 {
+public class ActivityIntro extends AppIntro {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Add slides
-        addSlide(AppIntroFragment.newInstance("Welcome to ArtGo!", "Discover public art in VIC", R.drawable.intro_slide1, Color.parseColor("#52BE80")));
-        addSlide(AppIntroFragment.newInstance("Start ur journey", "View all arts on Map", R.drawable.intro_slide2, Color.parseColor("#5DADE2")));
-        addSlide(AppIntroFragment.newInstance("Select an art", "Get more knowledge of the art", R.drawable.intro_slide3, Color.parseColor("#F4D03F")));
-        addSlide(AppIntroFragment.newInstance("Festival & Events", "Go & attend the best art activity around you", R.drawable.intro_slide4, Color.parseColor("#AF7AC5")));
+        addSlide(AppIntroFragment.newInstance("Welcome to ArtGo!", "The easiest way to discover public art", R.drawable.intro_slide1, Color.parseColor("#52BE80")));
+        addSlide(AppIntroFragment.newInstance("Start ur journey", " Look for art,galleries or museums", R.drawable.intro_slide2, Color.parseColor("#5DADE2")));
+        addSlide(AppIntroFragment.newInstance("Select one", " Get info and directions ", R.drawable.intro_slide3, Color.parseColor("#F4D03F")));
+        addSlide(AppIntroFragment.newInstance("Also check festivals & Events ", "You are ready to go!", R.drawable.intro_slide4, Color.parseColor("#AF7AC5")));
 
         //Setting up
-        //setBarColor(Color.parseColor("#1e4872"));
-        //setSeparatorColor(Color.parseColor("#2196F3"));
-        //showSkipButton(true);
+        setBarColor(Color.parseColor("#1e4872"));
+        setSeparatorColor(Color.parseColor("#2196F3"));
+        showSkipButton(true);
         setFadeAnimation();
         setVibrate(true);
         setVibrateIntensity(30);
