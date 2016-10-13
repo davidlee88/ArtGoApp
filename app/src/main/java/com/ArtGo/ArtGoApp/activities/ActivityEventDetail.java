@@ -74,11 +74,15 @@ import org.json.JSONObject;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
+
 import static android.Manifest.permission.CALL_PHONE;
 
 /**
@@ -305,7 +309,20 @@ public class ActivityEventDetail extends ActivityBase implements
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat ft = new SimpleDateFormat("dd-MM-yyyy");
+            Date start ;
+            Date end ;
+            String startDate = "";
+            String endDate = "";
+            try{
+                start = format.parse(mLocationDate);
+                end = format.parse(mLocationEndDate);
+                startDate = ft.format(start);
+                endDate = ft.format(end);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             //if the location doesn't have website, the button will be grey
             LinearLayout mBtnWebsite  = (LinearLayout) findViewById(R.id.btnWebsite);
             if(mLocationWebsite.equals("null")){
@@ -313,7 +330,7 @@ public class ActivityEventDetail extends ActivityBase implements
             }
             // When finished retrieve data from database, display data to the views
             mTxtDescription.setHtmlFromString("<strong>Start Date: </strong>  " +
-                    "<em>" + mLocationDate + "</em><br /><strong>End Date: </strong>  <em>"+mLocationEndDate+"</em>" +
+                    "<em>" + startDate + "</em><br /><strong>End Date: </strong>  <em>"+endDate+"</em>" +
                     "<br /><br /><strong>Description: </strong>" + mLocationDescription, true);
             mTxtLocationName.setText(mLocationName);
             mTxtLocationCategory.setText(mLocationCategory);
@@ -731,13 +748,55 @@ public class ActivityEventDetail extends ActivityBase implements
         // to the original bounds and show the thumbnail instead of
         // the expanded image.
         final float startScaleFinal = startScale;
-        expandedImageView.setOnClickListener(new View.OnClickListener() {
+        PhotoViewAttacher mAttacher = new PhotoViewAttacher(expandedImageView);
+        mAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
-            public void onClick(View view) {
+            public void onPhotoTap(View view, float x, float y) {
                 if (mCurrentAnimator != null) {
                     mCurrentAnimator.cancel();
                 }
+                // Animate the four positioning/sizing properties in parallel,
+                // back to their original values.
+                AnimatorSet set = new AnimatorSet();
+                set.play(ObjectAnimator
+                        .ofFloat(expandedImageView, View.X, startBounds.left))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.Y,startBounds.top))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.SCALE_X, startScaleFinal))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.SCALE_Y, startScaleFinal));
+                set.setDuration(mShortAnimationDuration);
+                set.setInterpolator(new DecelerateInterpolator());
+                set.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        thumbView.setAlpha(1f);
+                        expandedImageView.setVisibility(View.GONE);
+                        mScrollView.setVisibility(View.VISIBLE);
+                        mCurrentAnimator = null;
+                    }
 
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        thumbView.setAlpha(1f);
+                        expandedImageView.setVisibility(View.GONE);
+                        mScrollView.setVisibility(View.VISIBLE);
+                        mCurrentAnimator = null;
+                    }
+                });
+                set.start();
+                mCurrentAnimator = set;
+            }
+
+            @Override
+            public void onOutsidePhotoTap() {
+                if (mCurrentAnimator != null) {
+                    mCurrentAnimator.cancel();
+                }
                 // Animate the four positioning/sizing properties in parallel,
                 // back to their original values.
                 AnimatorSet set = new AnimatorSet();
@@ -775,6 +834,7 @@ public class ActivityEventDetail extends ActivityBase implements
                 mCurrentAnimator = set;
             }
         });
+        mAttacher.update();
     }
 
     private void zoomImageFromThumbLocal(final ImageView thumbView, int imageResId) {
@@ -866,18 +926,59 @@ public class ActivityEventDetail extends ActivityBase implements
         });
         set.start();
         mCurrentAnimator = set;
-
-        // Upon clicking the zoomed-in image, it should zoom back down
-        // to the original bounds and show the thumbnail instead of
-        // the expanded image.
         final float startScaleFinal = startScale;
-        expandedImageView.setOnClickListener(new View.OnClickListener() {
+
+        PhotoViewAttacher mAttacher = new PhotoViewAttacher(expandedImageView);
+
+        //make photo zoomable by pinch, and another tap for zoom back
+        mAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
-            public void onClick(View view) {
+            public void onPhotoTap(View view, float x, float y) {
                 if (mCurrentAnimator != null) {
                     mCurrentAnimator.cancel();
                 }
+                // Animate the four positioning/sizing properties in parallel,
+                // back to their original values.
+                AnimatorSet set = new AnimatorSet();
+                set.play(ObjectAnimator
+                        .ofFloat(expandedImageView, View.X, startBounds.left))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.Y,startBounds.top))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.SCALE_X, startScaleFinal))
+                        .with(ObjectAnimator
+                                .ofFloat(expandedImageView,
+                                        View.SCALE_Y, startScaleFinal));
+                set.setDuration(mShortAnimationDuration);
+                set.setInterpolator(new DecelerateInterpolator());
+                set.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        thumbView.setAlpha(1f);
+                        expandedImageView.setVisibility(View.GONE);
+                        mScrollView.setVisibility(View.VISIBLE);
+                        mCurrentAnimator = null;
+                    }
 
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        thumbView.setAlpha(1f);
+                        expandedImageView.setVisibility(View.GONE);
+                        mScrollView.setVisibility(View.VISIBLE);
+                        mCurrentAnimator = null;
+                    }
+                });
+                set.start();
+                mCurrentAnimator = set;
+            }
+
+            @Override
+            public void onOutsidePhotoTap() {
+                if (mCurrentAnimator != null) {
+                    mCurrentAnimator.cancel();
+                }
                 // Animate the four positioning/sizing properties in parallel,
                 // back to their original values.
                 AnimatorSet set = new AnimatorSet();
@@ -915,6 +1016,7 @@ public class ActivityEventDetail extends ActivityBase implements
                 mCurrentAnimator = set;
             }
         });
+        mAttacher.update();
     }
 
     private void makeACall(){

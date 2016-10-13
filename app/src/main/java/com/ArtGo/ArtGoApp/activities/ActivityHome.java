@@ -82,6 +82,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
@@ -148,6 +153,8 @@ public class ActivityHome extends AppCompatActivity
     // ClusterManager
     private ClusterManager<MyItem> mClusterManager;
 
+    //showcase help ID
+    private static final String SHOWCASE_ID = "help case";
 
     // Create arraylist variables to store data
     private ArrayList<String> mLocationIds          = new ArrayList<>();
@@ -185,6 +192,8 @@ public class ActivityHome extends AppCompatActivity
     // Flag permission
     private boolean mFlagGranted = true;
 
+    //menu item
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,7 +211,6 @@ public class ActivityHome extends AppCompatActivity
         mAdView          = (AdView) findViewById(R.id.adView);
         mMapFragment     = ((SupportMapFragment) getSupportFragmentManager()
                             .findFragmentById(R.id.map));
-
         // Set default map type
         mSelectedMapType = Utils.ARG_DEFAULT_MAP_TYPE;
 
@@ -317,12 +325,86 @@ public class ActivityHome extends AppCompatActivity
                             startActivity(aboutIntent);
                             overridePendingTransition(R.anim.open_next, R.anim.close_main);
                             return true;
+                        case R.id.menuHelp:
+                            if(mList.getVisibility() == View.GONE){
+                                presentShowcaseSequenceMap();
+
+                            }else{
+                                presentShowcaseSequenceList();
+                            }
+                            return true;
                         default:
                             return true;
                     }
                 }
             });
 
+    }
+
+    /*
+    *Copyright 2015 Dean Wild
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+    */
+    //method to show help on map view
+    public void presentShowcaseSequenceMap(){
+        //Set up showcase config
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500); // half second between each showcase view
+
+        //Build sequence showcase
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.spnCategory))
+                .setDismissText("GOT IT")
+                .setContentText("Click here to choose type of art work")
+                .withCircleShape()
+                .build()
+        );
+        sequence.addSequenceItem(findViewById(R.id.toolbar).findViewById(R.id.menuView), "Click here to change to list view", "GOT IT");
+        sequence.addSequenceItem(mFabLayer, "Click here to change map type", "GOT IT");
+        sequence.addSequenceItem(mFabLocation, "Click here to target to your location", "GOT IT");
+        sequence.start();
+    }
+
+    //method to show help on list view
+    public void presentShowcaseSequenceList(){
+        //Set up showcase config
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500); // half second between each showcase view
+
+        //Build sequence showcase
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.spnCategory))
+                .setDismissText("GOT IT")
+                .setContentText("Click here to choose type of art work")
+                .withCircleShape()
+                .build()
+        );
+        sequence.addSequenceItem(findViewById(R.id.toolbar).findViewById(R.id.menuView), "Click here to change to map view", "GOT IT");
+        sequence.addSequenceItem(new MaterialShowcaseView.Builder(this)
+                .setTarget(mList.getChildAt(0))
+                .setDismissText("GOT IT")
+                .setContentText("1. Location information showing here\n2. Click on it for detail information" +
+                        "\n3. Locations are sorted by their distances to you")
+                .withRectangleShape(true)
+                .build()
+        );
+        sequence.start();
     }
 
     // Method to hide fab buttons with scale animation
@@ -394,6 +476,7 @@ public class ActivityHome extends AppCompatActivity
                 .progress(true, 0)
                 .progressIndeterminateStyle(false)
                 .cancelable(false)
+                .backgroundColor(Color.parseColor("#5DADE2"))
                 .show();
 
         mMap = googleMap;
@@ -406,7 +489,6 @@ public class ActivityHome extends AppCompatActivity
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        //Log.d(Utils.TAG_PONGODEV + TAG, "onMapReady");
     }
 
     @Override
@@ -1009,6 +1091,7 @@ public class ActivityHome extends AppCompatActivity
                         .progress(true, 0)
                         .progressIndeterminateStyle(false)
                         .cancelable(false)
+                        .backgroundColor(Color.parseColor("#5DADE2"))
                         .show();
             }else{
                 progressDialog.setContent(R.string.loading_data);
@@ -1260,15 +1343,19 @@ public class ActivityHome extends AppCompatActivity
 
     //Method to load location detail in other page
     private void loadDetail(String id){
-        Intent detailIntent = new Intent(this, ActivityDetail.class);
-        detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
-        startActivity(detailIntent);
+
+            Intent detailIntent = new Intent(this, ActivityDetail.class);
+            detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
+            startActivity(detailIntent);
+
     }
 
     private void loadEventDetail(String id){
-        Intent detailIntent = new Intent(this, ActivityEventDetail.class);
-        detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
-        startActivity(detailIntent);
+
+            Intent detailIntent = new Intent(this, ActivityEventDetail.class);
+            detailIntent.putExtra(Utils.ARG_LOCATION_ID, id);
+            startActivity(detailIntent);
+
     }
 
     // Method to sort data by distance
