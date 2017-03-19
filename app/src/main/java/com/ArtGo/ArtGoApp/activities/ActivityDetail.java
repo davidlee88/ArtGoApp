@@ -5,9 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +26,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
@@ -75,10 +80,13 @@ import com.ArtGo.ArtGoApp.utils.ImageLoaderFromDrawable;
 import com.ArtGo.ArtGoApp.utils.MySingleton;
 import com.ArtGo.ArtGoApp.utils.Utils;
 import org.json.JSONObject;
+import org.sufficientlysecure.htmltextview.HtmlRemoteImageGetter;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -604,9 +612,9 @@ public class ActivityDetail extends ActivityBase implements
                 //mScrollView.setVisibility(View.INVISIBLE);
                 break;
             case R.id.btnShare1:
-                v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
-                sharePhotoToFB();
-                break;
+                    v.startAnimation(AnimationUtils.loadAnimation(this,R.anim.image_click));
+                    sharePhotoToFB();
+                    break;
         }
         }else{
             Toast.makeText(getApplicationContext(),"No Internet Connection",
@@ -1032,7 +1040,6 @@ public class ActivityDetail extends ActivityBase implements
                 // permission was granted, yay! Do the
                 // Call Phone-related task you need to do.
                 makeACall();
-                Log.d(Utils.TAG_PONGODEV + TAG, "Request Call Phone Allowed");
             } else {
                 // permission was not granted
                 if (getApplicationContext() == null) {
@@ -1198,4 +1205,6 @@ public class ActivityDetail extends ActivityBase implements
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+
 }
